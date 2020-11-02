@@ -1,15 +1,25 @@
+/**
+ * simple.c
+ *
+ * A simple kernel module.
+ *
+ * To compile, run makefile by entering "make"
+ *
+ * Operating System Concepts - 10th Edition
+ * Copyright John Wiley & Sons - 2018
+ */
+
 #include <linux/init.h>
-#include <linux/kernel.h>
 #include <linux/module.h>
+#include <linux/kernel.h>
+
 
 /*
  * printk():
  *  1. the kernel equivalent of printf()
  *  2. output sent to a kernel log buffer, accessible by the "dmesg" command
  *  3. printk() allows priority flags, whose values are given in  <linux/printk.h>
- *
  */
-
 
 /* [Module Entry Point] This function is called when the module is loaded. */
 int simple_init(void) {
