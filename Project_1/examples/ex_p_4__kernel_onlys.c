@@ -2,6 +2,9 @@
 // Created by GuoZL on 2020-11-02.
 //
 
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/kernel.h>
 
 #include <linux/hash.h>
 #include <linux/gcd.h>
