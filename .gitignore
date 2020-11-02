@@ -1,6 +1,10 @@
 # Prerequisites
 *.d
 
+# By G
+# ignore all folders starting with "_"
+_*/
+
 # CLion IDE
 /.idea/
 
