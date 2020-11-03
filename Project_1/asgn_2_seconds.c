@@ -37,7 +37,7 @@ static int proc_init(void)
     proc_create(PROC_NAME, 0, NULL, &proc_ops);
 
     START_JIFFIES = jiffies;
-    printk(KERN_INFO "[Assignment 2] /proc/%s created @jiffies=%ul\n",
+    printk(KERN_INFO "[Assignment 2] /proc/%s created @jiffies=%lu\n",
            PROC_NAME, START_JIFFIES);
 
     return 0;
