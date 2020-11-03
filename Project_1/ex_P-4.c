@@ -1,7 +1,3 @@
-//
-// Created by GuoZL on 2020-11-02.
-//
-
 // Exercises on Page P-4
 // 1. Print out the value of GOLDEN_RATIO_PRIME in the simple init() function.
 // 2. Print out the greatest common divisor of 3,300 and 24 in the simple_exit() function.
@@ -56,6 +52,6 @@ void simple_exit(void) {
 module_init(simple_init);
 module_exit(simple_exit);
 
-MODULE_LICENSE("GPL");
-MODULE_DESCRIPTION("Simple Module - Kernel Only's");
-MODULE_AUTHOR("SGG");
+MODULE_LICENSE("MIT");
+MODULE_DESCRIPTION("Exercises on P-4 Module, modified upon SGG's");
+MODULE_AUTHOR("G");
