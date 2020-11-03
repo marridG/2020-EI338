@@ -52,6 +52,6 @@ void simple_exit(void) {
 module_init(simple_init);
 module_exit(simple_exit);
 
-MODULE_LICENSE("MIT");
+MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Exercises on P-4 Module, modified upon SGG's");
 MODULE_AUTHOR("G");
