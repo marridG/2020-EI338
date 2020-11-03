@@ -80,8 +80,8 @@ static ssize_t proc_read(struct file *file, char __user *usr_buf, size_t count, 
 
     completed = 1;
 
-    rv = sprintf(buffer, "Elapsed Time in Seconds = %f\n",
-                (double)(jiffies-START_JIFFIES) / HZ);
+    rv = sprintf(buffer, "Elapsed Time in Seconds = %lu\n",
+                 ((jiffies - START_JIFFIES) / HZ));
 
     // copies the contents of buffer to userspace usr_buf
     copy_to_user(usr_buf, buffer, rv);  // "usr_buf" exists in user space.
