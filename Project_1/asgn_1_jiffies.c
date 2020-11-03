@@ -89,6 +89,6 @@ static ssize_t proc_read(struct file *file, char __user *usr_buf, size_t count, 
 module_init( proc_init );
 module_exit( proc_exit );
 
-MODULE_LICENSE("MIT");
+MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Jiffies Module, modified upon SGG's");
 MODULE_AUTHOR("G");
