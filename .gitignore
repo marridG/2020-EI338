@@ -2,8 +2,9 @@
 *.d
 
 # By G
-# ignore all folders starting with "_"
+# ignore all folders & files starting with "_"
 _*/
+_*.*
 
 # CLion IDE
 /.idea/
