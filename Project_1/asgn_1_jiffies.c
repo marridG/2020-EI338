@@ -86,8 +86,8 @@ static ssize_t proc_read(struct file *file, char __user *usr_buf, size_t count, 
 
 
 /* Macros for registering module entry and exit points. */
-module_init( proc_init );
-module_exit( proc_exit );
+module_init(proc_init);
+module_exit(proc_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Jiffies Module, modified upon SGG's");
