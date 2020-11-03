@@ -19,7 +19,7 @@
 /* [Module Entry Point] This function is called when the module is loaded. */
 int simple_init(void) {
     printk(KERN_INFO
-    "Loading Kernel Module \"kernel_onlys\"\n");
+    "Loading Kernel Module \"Exercises on Page P-4\"\n");
 
     // Page "P-4" Exercise - 1
     // unsigned long GOLDEN_RATIO_PRIME
@@ -49,7 +49,7 @@ void simple_exit(void) {
     "\t[EX 2] <unsigned long> gcd(3300, 24) = %lu\n", gcd(3300, 24));
 
     printk(KERN_INFO
-    "Removing Kernel Module \"kernel_onlys\"\n");
+    "Removing Kernel Module \"Exercises on Page P-4\"\n");
 }
 
 /* Macros for registering module entry and exit points. */
