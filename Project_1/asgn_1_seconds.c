@@ -95,5 +95,5 @@ module_init(proc_init);
 module_exit(proc_exit);
 
 MODULE_LICENSE("GPL");
-MODULE_DESCRIPTION("Jiffies Module, modified upon SGG's");
+MODULE_DESCRIPTION("Seconds Module, modified upon SGG's");
 MODULE_AUTHOR("G");
