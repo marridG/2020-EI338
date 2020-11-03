@@ -2,6 +2,12 @@
 // Created by GuoZL on 2020-11-02.
 //
 
+// Exercises on Page P-4
+// 1. Print out the value of GOLDEN_RATIO_PRIME in the simple init() function.
+// 2. Print out the greatest common divisor of 3,300 and 24 in the simple_exit() function.
+// 3. Print out the values of jiffies and HZ in the simple init() function.
+// 4. Print out the value of jiffies in the simple exit() function.
+
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/kernel.h>
@@ -18,7 +24,18 @@ int simple_init(void) {
     // Page "P-4" Exercise - 1
     // unsigned long GOLDEN_RATIO_PRIME
     printk(KERN_INFO
-    "\t<unsigned long> GOLDEN_RATIO_PRIME = %lu\n", GOLDEN_RATIO_PRIME);
+    "\t[EX 1] <unsigned long> GOLDEN_RATIO_PRIME = %lu\n", GOLDEN_RATIO_PRIME);
+
+    // Page "P-4" Exercise - 3
+    // HZ: timer tick rate (defined in <asm/param.h>)
+    printk(KERN_INFO
+    "\t[EX 3] HZ = %d\n", HZ);
+
+    // Page "P-4" Exercise - 4
+    // jiffies: # of timer interrupts occurred since the system was booted (defined in <linux/jiffies.h>)
+    printk(KERN_INFO
+    "\t[EX 4] jiffies = %lu\n", jiffies);
+
 
     return 0;
 }
@@ -29,7 +46,7 @@ void simple_exit(void) {
     // Page "P-4" Exercise - 2
     // unsigned long gcd(unsigned long a, unsigned b);
     printk(KERN_INFO
-    "\t<unsigned long> gcd(3300, 24) = %lu\n", gcd(3300, 24));
+    "\t[EX 2] <unsigned long> gcd(3300, 24) = %lu\n", gcd(3300, 24));
 
     printk(KERN_INFO
     "Removing Kernel Module \"kernel_onlys\"\n");
