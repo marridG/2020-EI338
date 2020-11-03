@@ -4,8 +4,8 @@ clear_dmesg(){
     echo "Kernel Log Buffer Cleared"
 }
 
-make
 clear_dmesg
+make
 echo "Initialized"
 
 
