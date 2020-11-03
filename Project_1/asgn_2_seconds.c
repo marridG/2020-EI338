@@ -49,7 +49,7 @@ static void proc_exit(void) {
     // removes the /proc/hello entry
     remove_proc_entry(PROC_NAME, NULL);
 
-    printk( KERN_INFO "[Assignment 2] /proc/%s removed\n", PROC_NAME);
+    printk(KERN_INFO "[Assignment 2] /proc/%s removed\n", PROC_NAME);
 }
 
 /**
@@ -81,7 +81,7 @@ static ssize_t proc_read(struct file *file, char __user *usr_buf, size_t count, 
     completed = 1;
 
     rv = sprintf(buffer, "Elapsed Time in Seconds = %f\n",
-                 double(jiffies-START_JIFFIES) / HZ);
+                (double)(jiffies-START_JIFFIES) / HZ);
 
     // copies the contents of buffer to userspace usr_buf
     copy_to_user(usr_buf, buffer, rv);  // "usr_buf" exists in user space.
