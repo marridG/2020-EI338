@@ -3,11 +3,6 @@ EI338 Computer Systems Engineering, SJTU, 2020 Spring
 **by Prof. Li J.**
 <!-- <br> -->
 
----
-*SUBMISSION OF*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  
-*LAST UPDATED*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;November 3rd, 2020
----
-
 
 <br>
 
@@ -46,13 +41,14 @@ EI338 Computer Systems Engineering, SJTU, 2020 Spring
 
 
 
-<br>
-
-
 <a id="environment"></a>
 ## Environment
 + OS: `Ubuntu 14.04 LTS`, Linux Kernel Version `4.4.0-142-generic`
 + Compiler: `GCC Version 4.8.4`
+
+
+<br>
+
 
 <a id="project-details"></a>
 ## Project Details

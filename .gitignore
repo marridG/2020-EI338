@@ -5,6 +5,8 @@
 # ignore all folders & files starting with "_"
 _*/
 _*.*
+# Ignore .pdf
+*.pdf
 
 # CLion IDE
 /.idea/
