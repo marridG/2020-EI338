@@ -446,3 +446,5 @@ echo "\tModule Removed"
 <a id="summary"></a>
 ## Summary
 Generally speaking, the project tasks are somehow simple and straight-forward.
+
+However, since floating point operations are not recommended due to hardware architecture capability concerns (even though posiible on Linux), the "seconds" assignment results cannot be satisfactory enough (which now only support printing integer elapsed time).
