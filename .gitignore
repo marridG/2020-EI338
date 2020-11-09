@@ -7,6 +7,9 @@ _*/
 _*.*
 # Ignore .pdf
 *.pdf
+# Ignore CMake Files
+CMakeLists.txt
+cmake-build-debug/
 
 # CLion IDE
 /.idea/
