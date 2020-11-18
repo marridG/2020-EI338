@@ -94,7 +94,7 @@ int main(void) {
     // Initialize the command, set as an empty string
     strcpy(command, "");
 
-    while (true) {
+    while (1) {
         printf("osh>");
         fflush(stdout);                 // flush the stream buffer
 
