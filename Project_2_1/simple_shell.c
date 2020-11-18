@@ -106,15 +106,15 @@ int main(void) {
             continue;
         }
 #ifdef DEBUG                            // print the stored input command
-        printf("The input command is: %s", command);
+        printf("[DEBUG] The input command is: \"%s\"", command);
 #endif
 
         // parse the input command
         size_t args_num = parse_input(args, command);
 #ifdef DEBUG                            // print the stored parsed arguments of the input command
-        printf("The parsed %zu arguments are:\n", args_num);
+        printf("[DEBUG] The parsed %zu arguments are:\n", args_num);
         for (size_t i = 0; i <= args_num - 1; i++)
-            printf("\t%s\n", args[i]);
+            printf("\t\"%s\"\n", args[i]);
 #endif
 
 
