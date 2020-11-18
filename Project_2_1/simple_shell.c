@@ -1,16 +1,111 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#define DEBUG
+#define MAX_LINE 80                     // Maximum Command Length
+#define DELIMITERS " \t\n\v\f\r"        // Delimiters of Parts in Commands
 
-#define MAX_LINE 80     // The maximum length command
+void refresh_args(char *args[]) {
+    /*
+     *   Refresh the Content of Arguments, i.e., Free Old Contents and Set to NULL
+     *   @param: args           the array to refresh
+     */
+    while (*args) {
+        free(*args);                    // to avoid memory leaks
+        *args++ = NULL;
+    }
+}
+
+
+bool get_input(char *command) {
+    /*
+     *   Get Command from Input or History
+     *   @param: command        variable to store the command, also the last command
+     *   @returns:              success or not
+     */
+
+    char input_buffer[MAX_LINE + 1];
+
+    // read one line of inputs (length <= MAX_LINE) and store in buffer
+    if (fgets(input_buffer, MAX_LINE + 1, stdin) == NULL) {
+        fprintf(stderr, "Failed to read input!\n");
+        return false;
+    }
+
+    // if (strncmp(input_buffer, "!!", 2) == 0) {
+    //     if (strlen(command) == 0) {  // no history yet
+    //         fprintf(stderr, "No history available yet!\n");
+    //         return false;
+    //     }
+    //     printf("%s", command);    // keep the command unchanged and print it
+    //     return true;
+    // }
+
+    // update the command
+    strcpy(command, input_buffer);
+
+    return true;
+}
+
+
+size_t parse_input(char *args[], char *original_command) {
+    /*
+     *   Parse Input and Store Arguments
+     *   @param: args           the array to store the parsed arguments
+     *   @param: command        the input command
+     *   @return:               the number of arguments
+     */
+
+    size_t num = 0;
+
+    // make a copy of input command since separation strtok() will change the values
+    char command[MAX_LINE + 1];
+    strcpy(command, original_command);
+
+    // continuously separate arguments by delimiters until End-of-Line
+    char *token = strtok(command, DELIMITERS);
+    while (token != NULL) {
+        // store the split arguments to the "referred output" argument variable
+        args[num] = malloc(strlen(token) + 1);
+        strcpy(args[num], token);
+        num++;
+        token = strtok(NULL, DELIMITERS);
+    }
+
+
+    return num;
+}
 
 
 int main(void) {
-    char *args[MAX_LINE / 2 + 1]; // command line arguments
-    int should_run = 1; // flag to determine when to exit program
-    while (should_run) {
+    char *args[MAX_LINE / 2 + 1];       // command line arguments
+    char command[MAX_LINE + 1];
+
+    //Initialize the arguments, set as NULL
+    for (size_t i = 0; i <= MAX_LINE / 2; ++i) {
+        args[i] = NULL;
+    }
+    // Initialize the command, set as an empty string
+    strcpy(command, "");
+
+    while (true) {
         printf("osh>");
-        fflush(stdout);
+        fflush(stdout);                 // flush the stream buffer
+
+        fflush(stdin);                  // flush the stream buffer
+        refresh_args(args);             // empty args before parsing
+
+        // get input
+        if (!get_input(command)) {
+            continue;
+        }
+#ifdef DEBUG
+        printf("%s", command);
+#endif
+        size_t args_num = parse_input(args, command);
+
+
+
         /**
         * After reading user input, the steps are:
         * (1) fork a child process using fork()
