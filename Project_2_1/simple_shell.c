@@ -34,7 +34,7 @@ int get_input(char *command) {
 
     // read one line of inputs (length <= MAX_LINE) and store in buffer
     if (fgets(input_buffer, MAX_LINE + 1, stdin) == NULL) {
-        fprintf(stderr, "Failed to read input!\n");
+        fprintf(stderr, "Failed to Read NULL Inputs\n");
         return 0;
     }
 
@@ -88,7 +88,7 @@ int main(void) {
     char command[MAX_LINE + 1];
 
     //Initialize the arguments, set as NULL
-    for (size_t i = 0; i <= MAX_LINE / 2; ++i) {
+    for (size_t i = 0; i <= MAX_LINE / 2; i++) {
         args[i] = NULL;
     }
     // Initialize the command, set as an empty string
@@ -101,15 +101,21 @@ int main(void) {
         fflush(stdin);                  // flush the stream buffer
         refresh_args(args);             // empty args before parsing
 
-        // get input
+        // get and store the input (notice that "empty" command ENTER is a success)
         if (!get_input(command)) {
             continue;
         }
-#ifdef DEBUG
-        printf("%s", command);
+#ifdef DEBUG                            // print the stored input command
+        printf("The input command is: %s", command);
 #endif
-        size_t args_num = parse_input(args, command);
 
+        // parse the input command
+        size_t args_num = parse_input(args, command);
+#ifdef DEBUG                            // print the stored parsed arguments of the input command
+        printf("The parsed %zu arguments are:\n", args_num);
+        for (size_t i = 0; i <= args_num - 1; i++)
+            printf("\t%s\n", args[i]);
+#endif
 
 
         /**
