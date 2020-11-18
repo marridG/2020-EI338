@@ -1,1 +1,1 @@
-make -std=c99
+make
