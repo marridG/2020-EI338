@@ -1,5 +1,11 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <sys/types.h>
 
 #define DEBUG
 #define MAX_LINE 80                     // Maximum Command Length
@@ -17,7 +23,7 @@ void refresh_args(char *args[]) {
 }
 
 
-bool get_input(char *command) {
+int get_input(char *command) {
     /*
      *   Get Command from Input or History
      *   @param: command        variable to store the command, also the last command
@@ -29,22 +35,22 @@ bool get_input(char *command) {
     // read one line of inputs (length <= MAX_LINE) and store in buffer
     if (fgets(input_buffer, MAX_LINE + 1, stdin) == NULL) {
         fprintf(stderr, "Failed to read input!\n");
-        return false;
+        return 0;
     }
 
     // if (strncmp(input_buffer, "!!", 2) == 0) {
     //     if (strlen(command) == 0) {  // no history yet
     //         fprintf(stderr, "No history available yet!\n");
-    //         return false;
+    //         return 0;
     //     }
     //     printf("%s", command);    // keep the command unchanged and print it
-    //     return true;
+    //     return 1;
     // }
 
     // update the command
     strcpy(command, input_buffer);
 
-    return true;
+    return 1;
 }
 
 
