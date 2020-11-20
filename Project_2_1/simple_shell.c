@@ -87,7 +87,7 @@ void print_help_msg() {
     printf("A Simple UNIX Shell\n\n"
            "usage: <command> [<args>]\n\n"
            "These are common commands used in various situations:\n\n"
-           "Control Commands"
+           "Control Commands\n"
            "  ?, help, -help, --help             Show the help messages\n"
            "  exit                               Exit the simple UNIX shell\n"
            "\n"
@@ -104,6 +104,7 @@ int main(void) {
     }
     // Initialize the command, set as an empty string
     strcpy(command, "");
+
 
     while (1) {
         printf("osh>");
@@ -125,18 +126,18 @@ int main(void) {
         if (0 == args_num) {
             continue;
         }
-#ifdef DEBUG                            // print the stored parsed arguments of the input command
+#ifdef DEBUG                            // print the stored parsed arguments of the nonempty input command
         printf("[DEBUG] The parsed %zu arguments are:\n", args_num);
         for (size_t i = 0; i <= args_num - 1; i++)
             printf("\t\"%s\"\n", args[i]);
 #endif
 
-        // enable "exit" command
+        // extra: enable "exit" command
         if (strcmp(args[0], "exit") == 0) {
             break;
         }
 
-        // enable "?", "help", "-help", "--help" command
+        // extra: enable "?", "help", "-help", "--help" command
         if (strcmp(args[0], "?") == 0 || strcmp(args[0], "help") == 0 ||
             strcmp(args[0], "-help") == 0 || strcmp(args[0], "--help") == 0) {
             print_help_msg();
