@@ -111,11 +111,19 @@ int main(void) {
 
         // parse the input command
         size_t args_num = parse_input(args, command);
+        if (0 == args_num) {
+            continue;
+        }
 #ifdef DEBUG                            // print the stored parsed arguments of the input command
         printf("[DEBUG] The parsed %zu arguments are:\n", args_num);
         for (size_t i = 0; i <= args_num - 1; i++)
             printf("\t\"%s\"\n", args[i]);
 #endif
+
+        // enable "exit" command
+        if (strcmp(args[0], "exit") == 0) {
+            break;
+        }
 
 
         /**
