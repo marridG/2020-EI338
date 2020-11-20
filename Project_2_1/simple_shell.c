@@ -106,7 +106,7 @@ int main(void) {
             continue;
         }
 #ifdef DEBUG                            // print the stored input command
-        printf("[DEBUG] The input command is: \"%s\"", command);
+        printf("[DEBUG] The input command is: \"%s\"\n", command);
 #endif
 
         // parse the input command
