@@ -83,6 +83,17 @@ size_t parse_input(char *args[], char *original_command) {
 }
 
 
+void print_help_msg() {
+    printf("A Simple UNIX Shell\n\n"
+           "usage: <command> [<args>]\n\n"
+           "These are common commands used in various situations:\n\n"
+           "Control Commands"
+           "  ?, help, -help, --help             Show the help messages\n"
+           "  exit                               Exit the simple UNIX shell\n"
+           "\n"
+           "Some other UNIX commands are also supported, you may try yourself\n");
+}
+
 int main(void) {
     char *args[MAX_LINE / 2 + 1];       // command line arguments
     char command[MAX_LINE + 1];
@@ -123,6 +134,13 @@ int main(void) {
         // enable "exit" command
         if (strcmp(args[0], "exit") == 0) {
             break;
+        }
+
+        // enable "?", "help", "-help", "--help" command
+        if (strcmp(args[0], "?") == 0 || strcmp(args[0], "help") == 0 ||
+            strcmp(args[0], "-help") == 0 || strcmp(args[0], "--help") == 0) {
+            print_help_msg();
+            continue;
         }
 
 
