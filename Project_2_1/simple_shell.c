@@ -212,7 +212,7 @@ int redirect_io(unsigned io_flag, char *input_file, char *output_file, int *inpu
             return 0;
         }
 #ifdef DEBUG
-        printf("\"[DEBUG] Redirecting I/O - Output To: \"%s\" (opened as %d)\n", output_file, *output_desc);
+        printf("[DEBUG] Redirecting I/O - Output To: \"%s\" (opened as %d)\n", output_file, *output_desc);
 #endif
         dup2(*output_desc, STDOUT_FILENO);
     }
@@ -270,8 +270,9 @@ int run_command(char **args, size_t args_num) {
         fprintf(stderr, "Failed to fork!\n");
         return 0;
     }
-        // [PROCESS] child process
-    else if (pid == 0) {
+
+    // [PROCESS] child process
+    if (pid == 0) {
         if (args_num2 != 0) {    // pipe
             // /* Create pipe */
             // int fd[2];
@@ -314,6 +315,7 @@ int run_command(char **args, size_t args_num) {
             //     fflush(stdin);
             // }
         }
+
             // [PIPE] NO pipe
         else {
             /* Redirect I/O */
@@ -321,13 +323,16 @@ int run_command(char **args, size_t args_num) {
             int input_desc, output_desc;
             unsigned io_flag = check_io_redirection(
                     args, &args_num, &input_file, &output_file);    // bit 1 for output, bit 0 for input
+            // redirect I/O
             if (0 == redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc)) {
                 return 0;
             }
-            size_t exe_result = execvp(args[0], args);
+            // execute
+            int exe_result = execvp(args[0], args);
 #ifdef DEBUG
-            printf("[DEBUG] Execution End with Status %zu\n", exe_result);
+            printf("[DEBUG] Execution End with Status %d\n", exe_result);
 #endif
+            if (-1 == exe_result) exit(0);      // https://blog.csdn.net/qq_39309971/article/details/80216007
             close_file(io_flag, input_desc, output_desc);
             fflush(stdin);
         }
