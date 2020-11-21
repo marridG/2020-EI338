@@ -38,7 +38,7 @@ int get_input(char *command) {
     }
 
     // remove EOL \n, \r
-    input_buffer[strlen(input_buffer)] = '\0';
+    input_buffer[strlen(input_buffer) - 1] = '\0';
 
     // handle "empty" command, i.e., only the removed ENTER
     if (0 == strlen(input_buffer)) { return 0; }
