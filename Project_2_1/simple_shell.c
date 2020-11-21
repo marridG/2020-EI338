@@ -278,12 +278,8 @@ int main(void) {
         }
 
 
-        /**
-        * After reading user input, the steps are:
-        * (1) fork a child process using fork()
-        * (2) the child process will invoke execvp()
-        * (3) parent will invoke wait() unless command included &
-        */
+        // [RUN] Execute command
+        run_command(args, args_num);
     }
     return 0;
 }
