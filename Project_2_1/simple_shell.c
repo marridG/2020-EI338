@@ -205,7 +205,11 @@ int run_command(char **args, size_t args_num) {
             // if (redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc) == 0) {
             //     return 0;
             // }
-            execvp(args[0], args);
+            size_t exe_result = execvp(args[0], args);
+#ifdef DEBUG
+            printf("%d\n", exe_result);
+            fflush(stdout);
+#endif
             // close_file(io_flag, input_desc, output_desc);
             fflush(stdin);
         }
