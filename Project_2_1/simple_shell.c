@@ -207,7 +207,7 @@ int run_command(char **args, size_t args_num) {
             // }
             size_t exe_result = execvp(args[0], args);
 #ifdef DEBUG
-            printf("%d\n", exe_result);
+            printf("%zu\n", exe_result);
             fflush(stdout);
 #endif
             // close_file(io_flag, input_desc, output_desc);
