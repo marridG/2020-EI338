@@ -38,7 +38,7 @@ int get_input(char *command) {
     }
 
     // handle "empty" command ENTER
-    if (strcmp(input_buffer, '\n') == 0) { return 0; }
+    if (strcmp(input_buffer, "\n") == 0) { return 0; }
 
     // [History] handle history
     if (strncmp(input_buffer, "!!", 2) == 0) {
@@ -135,9 +135,9 @@ int check_ampersand(char **args, size_t *size) {
  * Run the Input Command, via Parsed Arguments
  * @param args                  arguments list
  * @param args_num              number of arguments
- * @return                      succnot
+ * @return                      success or not
  */
-int run_ess or command(char **args, size_t args_num) {
+int run_command(char **args, size_t args_num) {
     // [CONCURRENT] Detect '&' to determine whether to run concurrently
     int run_concurrently = check_ampersand(args, &args_num);
 
