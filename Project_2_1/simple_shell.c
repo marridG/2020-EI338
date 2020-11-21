@@ -24,7 +24,7 @@ void refresh_args(char *args[]) {
 
 
 /*!
- * Get Command from Input or History
+ * Get Command from Input (with EOL \n, \r removed) or History
  * @param command               variable to store the command, also the last command
  * @return                      1 = successful, 0 = unsuccessful
  */
@@ -37,8 +37,11 @@ int get_input(char *command) {
         return 0;
     }
 
-    // handle "empty" command ENTER
-    if (strcmp(input_buffer, "\n") == 0) { return 0; }
+    // remove EOL \n, \r
+    input_buffer[strlen(input_buffer)] = '\0';
+
+    // handle "empty" command, i.e., only the removed ENTER
+    if (0 == strlen(input_buffer)) { return 0; }
 
     // [History] handle history
     if (strncmp(input_buffer, "!!", 2) == 0) {
@@ -205,11 +208,11 @@ int redirect_io(unsigned io_flag, char *input_file, char *output_file, int *inpu
     if (io_flag & 2) {
         *output_desc = open(output_file, O_WRONLY | O_CREAT | O_TRUNC, 644);    // unmask auth
         if (*output_desc < 0) {
-            fprintf(stderr, "[Error] Failed to open the output file: %s\n", output_file);
+            fprintf(stderr, "[Error] Failed to open the output file: \"%s\"\n", output_file);
             return 0;
         }
 #ifdef DEBUG
-        printf("\"[DEBUG] Redirecting I/O - Output To: %s (opened as %d)\n", output_file, *output_desc);
+        printf("\"[DEBUG] Redirecting I/O - Output To: \"%s\" (opened as %d)\n", output_file, *output_desc);
 #endif
         dup2(*output_desc, STDOUT_FILENO);
     }
@@ -218,11 +221,11 @@ int redirect_io(unsigned io_flag, char *input_file, char *output_file, int *inpu
     if (io_flag & 1) { // redirecting input
         *input_desc = open(input_file, O_RDONLY, 644);                          // unmask auth
         if (*input_desc < 0) {
-            fprintf(stderr, "[Error] Failed to open the input file: %s\n", input_file);
+            fprintf(stderr, "[Error] Failed to open the input file: \"%s\"\n", input_file);
             return 0;
         }
 #ifdef DEBUG
-        printf("[DEBUG] Redirecting I/O - Input from: %s (opened as %d)\n", input_file, *input_desc);
+        printf("[DEBUG] Redirecting I/O - Input from: \"%s\" (opened as %d)\n", input_file, *input_desc);
 #endif
         dup2(*input_desc, STDIN_FILENO);
     }
