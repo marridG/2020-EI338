@@ -37,16 +37,19 @@ int get_input(char *command) {
         return 0;
     }
 
-    // if (strncmp(input_buffer, "!!", 2) == 0) {
-    //     if (strlen(command) == 0) {  // no history yet
-    //         fprintf(stderr, "No history available yet!\n");
-    //         return 0;
-    //     }
-    //     printf("%s", command);           // keep the command unchanged and print it
-    //     return 1;
-    // }
+    // [History] handle history
+    if (strncmp(input_buffer, "!!", 2) == 0) {
+        // no command history
+        if (strlen(command) == 0) {
+            fprintf(stderr, "[Error] No Command History\n");
+            return 0;
+        }
+        // print the stored history, keep the command unchanged and exit
+        printf("%s", command);
+        return 1;
+    }
 
-    // update the command
+    // [Non-History] update the command by the inputs
     strcpy(command, input_buffer);
 
     return 1;
@@ -206,10 +209,7 @@ int run_command(char **args, size_t args_num) {
             //     return 0;
             // }
             size_t exe_result = execvp(args[0], args);
-#ifdef DEBUG
-            printf("%zu\n", exe_result);
-            fflush(stdout);
-#endif
+
             // close_file(io_flag, input_desc, output_desc);
             fflush(stdin);
         }
@@ -277,9 +277,10 @@ int main(void) {
             continue;
         }
 
-
         // [RUN] Execute command
         run_command(args, args_num);
     }
+
+
     return 0;
 }
