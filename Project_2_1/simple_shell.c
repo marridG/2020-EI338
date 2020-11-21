@@ -23,13 +23,12 @@ void refresh_args(char *args[]) {
 }
 
 
+/*!
+ * Get Command from Input or History
+ * @param command               variable to store the command, also the last command
+ * @return                      1 = successful, 0 = unsuccessful
+ */
 int get_input(char *command) {
-    /*
-     *   Get Command from Input or History
-     *   @param: command        variable to store the command, also the last command
-     *   @returns:              success or not
-     */
-
     char input_buffer[MAX_LINE + 1];
 
     // read one line of inputs (length <= MAX_LINE) and store in buffer
@@ -43,7 +42,7 @@ int get_input(char *command) {
     //         fprintf(stderr, "No history available yet!\n");
     //         return 0;
     //     }
-    //     printf("%s", command);    // keep the command unchanged and print it
+    //     printf("%s", command);           // keep the command unchanged and print it
     //     return 1;
     // }
 
@@ -54,14 +53,13 @@ int get_input(char *command) {
 }
 
 
+/*!
+ * Parse Input and Store Arguments
+ * @param args                  the array to store the parsed arguments
+ * @param original_command      the input command
+ * @return                      the number of arguments
+ */
 size_t parse_input(char *args[], char *original_command) {
-    /*
-     *   Parse Input and Store Arguments
-     *   @param: args           the array to store the parsed arguments
-     *   @param: command        the input command
-     *   @return:               the number of arguments
-     */
-
     size_t num = 0;
 
     // make a copy of input command since separation strtok() will change the values
@@ -83,6 +81,9 @@ size_t parse_input(char *args[], char *original_command) {
 }
 
 
+/*!
+ * Print the Help Messages
+ */
 void print_help_msg() {
     printf("A Simple UNIX Shell\n\n"
            "usage: <command> [<args>]\n\n"
@@ -94,15 +95,143 @@ void print_help_msg() {
            "Some other UNIX commands are also supported, you may try yourself\n");
 }
 
+
+/*!
+ *   Check whether an Ampersand (&) is in the End of Arguments. If so,
+ *      (1) remove '&' from the last arg
+ *      (2) remove the whole last arg if it becomes empty (actually should be)
+ *   @param: args           the array to check
+ *   @param: size           the pointer to array size
+ *   @return                whether an ampersand is in the end: 1=yes, 0=no
+ */
+int check_ampersand(char **args, size_t *size) {
+
+    size_t len = strlen(args[*size - 1]);
+
+    // check whether & is in the last argument
+    if (args[*size - 1][len - 1] != '&') {
+        return 0;
+    }
+
+    // remove the whole last arg if arg=='&' exactly
+    if (len == 1) {
+        free(args[*size - 1]);
+        args[*size - 1] = NULL;
+        --(*size);                      // reduce its size
+    }
+        // remove only the '&' in the last command
+    else {
+        args[*size - 1][len - 1] = '\0';
+    }
+
+
+    return 1;
+}
+
+
+/*!
+ * Run the Input Command, via Parsed Arguments
+ * @param args                  arguments list
+ * @param args_num              number of arguments
+ * @return                      success or not
+ */
+int run_command(char **args, size_t args_num) {
+    // [CONCURRENT] Detect '&' to determine whether to run concurrently
+    int run_concurrently = check_ampersand(args, &args_num);
+
+    // [PIPE]
+    char **args2;
+    size_t args_num2 = 0;
+    detect_pipe(args, &args_num, &args2, &args_num2);
+
+    // [EXECUTE] Create a child process
+    pid_t pid = fork();
+
+    // fork failed
+    if (pid < 0) {
+        fprintf(stderr, "Failed to fork!\n");
+        return 0;
+    }
+        // [PROCESS] child process
+    else if (pid == 0) {
+        if (args_num2 != 0) {    // pipe
+            /* Create pipe */
+            int fd[2];
+            pipe(fd);
+            /* Fork into another two processes */
+            pid_t pid2 = fork();
+            if (pid2 > 0) {  // child process for the second command
+                /* Redirect I/O */
+                char *input_file, *output_file;
+                int input_desc, output_desc;
+                unsigned io_flag = check_redirection(args2, &args_num2, &input_file,
+                                                     &output_file);    // bit 1 for output, bit 0 for input
+                io_flag &= 2;   // disable input redirection
+                if (redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc) == 0) {
+                    return 0;
+                }
+                close(fd[1]);
+                dup2(fd[0], STDIN_FILENO);
+                wait(NULL);     // wait for the first command to finish
+                execvp(args2[0], args2);
+                close_file(io_flag, input_desc, output_desc);
+                close(fd[0]);
+                fflush(stdin);
+            }
+            else if (pid2 == 0) {  // grandchild process for the first command
+                /* Redirect I/O */
+                char *input_file, *output_file;
+                int input_desc, output_desc;
+                unsigned io_flag = check_redirection(args, &args_num, &input_file,
+                                                     &output_file);    // bit 1 for output, bit 0 for input
+                io_flag &= 1;   // disable output redirection
+                if (redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc) == 0) {
+                    return 0;
+                }
+                close(fd[0]);
+                dup2(fd[1], STDOUT_FILENO);
+                execvp(args[0], args);
+                close_file(io_flag, input_desc, output_desc);
+                close(fd[1]);
+                fflush(stdin);
+            }
+        }
+        else {    // no pipe
+            // /* Redirect I/O */
+            // char *input_file, *output_file;
+            // int input_desc, output_desc;
+            // unsigned io_flag = check_redirection(args, &args_num, &input_file,
+            //                                      &output_file);    // bit 1 for output, bit 0 for input
+            // if (redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc) == 0) {
+            //     return 0;
+            // }
+            execvp(args[0], args);
+            // close_file(io_flag, input_desc, output_desc);
+            fflush(stdin);
+        }
+    }
+
+        // [PROCESS] parent process
+    else {
+        // parent waits for child's exit, i.e, not concurrently
+        if (!run_concurrently) {
+            wait(NULL);
+        }
+    }
+
+    return 1;
+}
+
+
 int main(void) {
     char *args[MAX_LINE / 2 + 1];       // command line arguments
     char command[MAX_LINE + 1];
 
-    //Initialize the arguments, set as NULL
+    // [INIT] Initialize the arguments, set as NULL
     for (size_t i = 0; i <= MAX_LINE / 2; i++) {
         args[i] = NULL;
     }
-    // Initialize the command, set as an empty string
+    // [INIT] Initialize the command, set as an empty string
     strcpy(command, "");
 
 
@@ -113,7 +242,7 @@ int main(void) {
         fflush(stdin);                  // flush the stream buffer
         refresh_args(args);             // empty args before parsing
 
-        // get and store the input (notice that "empty" command ENTER is a success)
+        // [INPUT] Get and store the input (notice that "empty" command ENTER is a success)
         if (!get_input(command)) {
             continue;
         }
@@ -121,7 +250,7 @@ int main(void) {
         printf("[DEBUG] The input command is: \"%s\"\n", command);
 #endif
 
-        // parse the input command
+        // [INPUT] Parse the input command
         size_t args_num = parse_input(args, command);
         if (0 == args_num) {
             continue;
@@ -132,12 +261,12 @@ int main(void) {
             printf("\t\"%s\"\n", args[i]);
 #endif
 
-        // extra: enable "exit" command
+        // [INPUT] [Extra] Enable "exit" command
         if (strcmp(args[0], "exit") == 0) {
             break;
         }
 
-        // extra: enable "?", "help", "-help", "--help" command
+        // [INPUT] [Extra] Enable "?", "help", "-help", "--help" command
         if (strcmp(args[0], "?") == 0 || strcmp(args[0], "help") == 0 ||
             strcmp(args[0], "-help") == 0 || strcmp(args[0], "--help") == 0) {
             print_help_msg();
