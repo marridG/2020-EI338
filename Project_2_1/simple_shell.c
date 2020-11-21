@@ -217,9 +217,9 @@ int redirect_io(unsigned io_flag, char *input_file, char *output_file, int *inpu
         dup2(*output_desc, STDOUT_FILENO);
     }
 
-    // [OUTPUT] Redirect output
+    // [OUTPUT] Redirect intput
     if (io_flag & 1) { // redirecting input
-        *input_desc = open(input_file, O_RDONLY, 644);                          // unmask auth
+        *input_desc = open(input_file, O_RDONLY, 0644);                         // unmask auth
         if (*input_desc < 0) {
             fprintf(stderr, "[Error] Failed to open the input file: \"%s\"\n", input_file);
             return 0;
@@ -242,8 +242,19 @@ int redirect_io(unsigned io_flag, char *input_file, char *output_file, int *inpu
  *   @param: output_decs    file descriptor of output file
  */
 void close_file(unsigned io_flag, int input_desc, int output_desc) {
-    if (io_flag & 2) { close(output_desc); }
-    if (io_flag & 1) { close(input_desc); }
+    if (io_flag & 2) {
+        close(output_desc);
+#ifdef DEBUG
+        printf("[DEBUG] Redirected Output File (Opened as %d) Closed", output_desc);
+#endif
+    }
+
+    if (io_flag & 1) {
+        close(input_desc);
+#ifdef DEBUG
+        printf("[DEBUG] Redirected Input File (Opened as %d) Closed", output_desc);
+#endif
+    }
 }
 
 
@@ -318,12 +329,11 @@ int run_command(char **args, size_t args_num) {
 
             // [PIPE] NO pipe
         else {
-            /* Redirect I/O */
+            // redirect I/O
             char *input_file, *output_file;
             int input_desc, output_desc;
             unsigned io_flag = check_io_redirection(
-                    args, &args_num, &input_file, &output_file);    // bit 1 for output, bit 0 for input
-            // redirect I/O
+                    args, &args_num, &input_file, &output_file);    // bit 1=output, bit 0=input
             if (0 == redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc)) {
                 return 0;
             }
@@ -332,9 +342,9 @@ int run_command(char **args, size_t args_num) {
 #ifdef DEBUG
             printf("[DEBUG] Execution End with Status %d\n", exe_result);
 #endif
-            if (-1 == exe_result) exit(0);      // https://blog.csdn.net/qq_39309971/article/details/80216007
             close_file(io_flag, input_desc, output_desc);
             fflush(stdin);
+            if (-1 == exe_result) exit(0);      // https://blog.csdn.net/qq_39309971/article/details/80216007
         }
     }
 
