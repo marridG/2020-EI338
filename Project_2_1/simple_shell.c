@@ -155,46 +155,46 @@ int run_command(char **args, size_t args_num) {
         // [PROCESS] child process
     else if (pid == 0) {
         if (args_num2 != 0) {    // pipe
-            /* Create pipe */
-            int fd[2];
-            pipe(fd);
-            /* Fork into another two processes */
-            pid_t pid2 = fork();
-            if (pid2 > 0) {  // child process for the second command
-                /* Redirect I/O */
-                char *input_file, *output_file;
-                int input_desc, output_desc;
-                unsigned io_flag = check_redirection(args2, &args_num2, &input_file,
-                                                     &output_file);    // bit 1 for output, bit 0 for input
-                io_flag &= 2;   // disable input redirection
-                if (redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc) == 0) {
-                    return 0;
-                }
-                close(fd[1]);
-                dup2(fd[0], STDIN_FILENO);
-                wait(NULL);     // wait for the first command to finish
-                execvp(args2[0], args2);
-                close_file(io_flag, input_desc, output_desc);
-                close(fd[0]);
-                fflush(stdin);
-            }
-            else if (pid2 == 0) {  // grandchild process for the first command
-                /* Redirect I/O */
-                char *input_file, *output_file;
-                int input_desc, output_desc;
-                unsigned io_flag = check_redirection(args, &args_num, &input_file,
-                                                     &output_file);    // bit 1 for output, bit 0 for input
-                io_flag &= 1;   // disable output redirection
-                if (redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc) == 0) {
-                    return 0;
-                }
-                close(fd[0]);
-                dup2(fd[1], STDOUT_FILENO);
-                execvp(args[0], args);
-                close_file(io_flag, input_desc, output_desc);
-                close(fd[1]);
-                fflush(stdin);
-            }
+            // /* Create pipe */
+            // int fd[2];
+            // pipe(fd);
+            // /* Fork into another two processes */
+            // pid_t pid2 = fork();
+            // if (pid2 > 0) {  // child process for the second command
+            //     /* Redirect I/O */
+            //     char *input_file, *output_file;
+            //     int input_desc, output_desc;
+            //     unsigned io_flag = check_redirection(args2, &args_num2, &input_file,
+            //                                          &output_file);    // bit 1 for output, bit 0 for input
+            //     io_flag &= 2;   // disable input redirection
+            //     if (redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc) == 0) {
+            //         return 0;
+            //     }
+            //     close(fd[1]);
+            //     dup2(fd[0], STDIN_FILENO);
+            //     wait(NULL);     // wait for the first command to finish
+            //     execvp(args2[0], args2);
+            //     close_file(io_flag, input_desc, output_desc);
+            //     close(fd[0]);
+            //     fflush(stdin);
+            // }
+            // else if (pid2 == 0) {  // grandchild process for the first command
+            //     /* Redirect I/O */
+            //     char *input_file, *output_file;
+            //     int input_desc, output_desc;
+            //     unsigned io_flag = check_redirection(args, &args_num, &input_file,
+            //                                          &output_file);    // bit 1 for output, bit 0 for input
+            //     io_flag &= 1;   // disable output redirection
+            //     if (redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc) == 0) {
+            //         return 0;
+            //     }
+            //     close(fd[0]);
+            //     dup2(fd[1], STDOUT_FILENO);
+            //     execvp(args[0], args);
+            //     close_file(io_flag, input_desc, output_desc);
+            //     close(fd[1]);
+            //     fflush(stdin);
+            // }
         }
         else {    // no pipe
             // /* Redirect I/O */
