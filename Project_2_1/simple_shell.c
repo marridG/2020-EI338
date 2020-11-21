@@ -142,7 +142,7 @@ int run_command(char **args, size_t args_num) {
     // [PIPE]
     char **args2;
     size_t args_num2 = 0;
-    detect_pipe(args, &args_num, &args2, &args_num2);
+    // detect_pipe(args, &args_num, &args2, &args_num2);
 
     // [EXECUTE] Create a child process
     pid_t pid = fork();
