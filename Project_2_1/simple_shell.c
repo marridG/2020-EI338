@@ -202,11 +202,11 @@ int redirect_io(unsigned io_flag, char *input_file, char *output_file, int *inpu
 #ifdef DEBUG
     printf("[DEBUG] Redirecting I/O - IO flag: %u\n", io_flag);
 #endif
-    // open() & authorities: https://blog.csdn.net/sdhgood/article/details/39555311
+    // open() & authorities: https://en.wikipedia.org/wiki/Umask
 
     // [OUTPUT] Redirect output
     if (io_flag & 2) {
-        *output_desc = open(output_file, O_WRONLY | O_CREAT | O_TRUNC, 644);    // unmask auth
+        *output_desc = open(output_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);    // unmask auth
         if (*output_desc < 0) {
             fprintf(stderr, "[Error] Failed to open the output file: \"%s\"\n", output_file);
             return 0;
