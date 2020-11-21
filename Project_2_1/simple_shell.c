@@ -37,6 +37,9 @@ int get_input(char *command) {
         return 0;
     }
 
+    // handle "empty" command ENTER
+    if (strcmp(input_buffer, '\n') == 0) { return 0; }
+
     // [History] handle history
     if (strncmp(input_buffer, "!!", 2) == 0) {
         // no command history
@@ -112,9 +115,7 @@ int check_ampersand(char **args, size_t *size) {
     size_t len = strlen(args[*size - 1]);
 
     // check whether & is in the last argument
-    if (args[*size - 1][len - 1] != '&') {
-        return 0;
-    }
+    if (args[*size - 1][len - 1] != '&') { return 0; }
 
     // remove the whole last arg if arg=='&' exactly
     if (len == 1) {
@@ -123,9 +124,7 @@ int check_ampersand(char **args, size_t *size) {
         --(*size);                      // reduce its size
     }
         // remove only the '&' in the last command
-    else {
-        args[*size - 1][len - 1] = '\0';
-    }
+    else { args[*size - 1][len - 1] = '\0'; }
 
 
     return 1;
@@ -136,9 +135,9 @@ int check_ampersand(char **args, size_t *size) {
  * Run the Input Command, via Parsed Arguments
  * @param args                  arguments list
  * @param args_num              number of arguments
- * @return                      success or not
+ * @return                      succnot
  */
-int run_command(char **args, size_t args_num) {
+int run_ess or command(char **args, size_t args_num) {
     // [CONCURRENT] Detect '&' to determine whether to run concurrently
     int run_concurrently = check_ampersand(args, &args_num);
 
@@ -232,9 +231,7 @@ int main(void) {
     char command[MAX_LINE + 1];
 
     // [INIT] Initialize the arguments, set as NULL
-    for (size_t i = 0; i <= MAX_LINE / 2; i++) {
-        args[i] = NULL;
-    }
+    for (size_t i = 0; i <= MAX_LINE / 2; i++) { args[i] = NULL; }
     // [INIT] Initialize the command, set as an empty string
     strcpy(command, "");
 
@@ -247,28 +244,21 @@ int main(void) {
         refresh_args(args);             // empty args before parsing
 
         // [INPUT] Get and store the input (notice that "empty" command ENTER is a success)
-        if (!get_input(command)) {
-            continue;
-        }
+        if (!get_input(command)) { continue; }
 #ifdef DEBUG                            // print the stored input command
         printf("[DEBUG] The input command is: \"%s\"\n", command);
 #endif
 
         // [INPUT] Parse the input command
         size_t args_num = parse_input(args, command);
-        if (0 == args_num) {
-            continue;
-        }
+        if (0 == args_num) { continue; }
 #ifdef DEBUG                            // print the stored parsed arguments of the nonempty input command
         printf("[DEBUG] The parsed %zu arguments are:\n", args_num);
-        for (size_t i = 0; i <= args_num - 1; i++)
-            printf("\t\"%s\"\n", args[i]);
+        for (size_t i = 0; i <= args_num - 1; i++) { printf("\t\"%s\"\n", args[i]); }
 #endif
 
         // [INPUT] [Extra] Enable "exit" command
-        if (strcmp(args[0], "exit") == 0) {
-            break;
-        }
+        if (strcmp(args[0], "exit") == 0) { break; }
 
         // [INPUT] [Extra] Enable "?", "help", "-help", "--help" command
         if (strcmp(args[0], "?") == 0 || strcmp(args[0], "help") == 0 ||
