@@ -11,11 +11,11 @@
 #define MAX_LINE 80                     // Maximum Command Length
 #define DELIMITERS " \t\n\v\f\r"        // Delimiters of Parts in Commands
 
+/*!
+ *   Refresh the Content of Arguments, i.e., Free Old Contents and Set to NULL
+ *   @param: args           the array to refresh
+ */
 void refresh_args(char *args[]) {
-    /*
-     *   Refresh the Content of Arguments, i.e., Free Old Contents and Set to NULL
-     *   @param: args           the array to refresh
-     */
     while (*args) {
         free(*args);                    // to avoid memory leaks
         *args++ = NULL;
@@ -132,6 +132,119 @@ int check_ampersand(char **args, size_t *size) {
 
 
 /*!
+ *   Check the Redirection Symbols in the Arguments
+ *      (1) remove "<", ">"         (2) remove the in-/out-put file arg
+ *   @param: args           arguments list
+ *   @param: size           the number of arguments
+ *   @param: input_file     file name for input
+ *   @param: output_file    file name for output
+ *   @return:               IO flag (bit 1 for output, bit 0 for input)
+ */
+unsigned check_io_redirection(char **args, size_t *size, char **input_file, char **output_file) {
+    unsigned flag = 0;
+    size_t to_remove[4], remove_cnt = 0;
+    for (size_t i = 0; i <= *size - 1; i++) {
+        if (remove_cnt >= 4) { break; }
+
+        // [INPUT] input symbol detected
+        if (strcmp("<", args[i]) == 0) {
+            to_remove[remove_cnt++] = i;
+            if (i == (*size) - 1) {
+                fprintf(stderr, "[Error] Input from UNKNOWN File\n");
+                break;
+            }
+            flag |= 1;
+            *input_file = args[i + 1];
+            to_remove[remove_cnt++] = ++i;
+        }
+
+            // [OUTPUT] output symbol detected
+        else if (strcmp(">", args[i]) == 0) {
+            to_remove[remove_cnt++] = i;
+            if (i == (*size) - 1) {
+                fprintf(stderr, "[Error] Output to UNKNOWN File\n");
+                break;
+            }
+            flag |= 2;
+            *output_file = args[i + 1];
+            to_remove[remove_cnt++] = ++i;
+        }
+    }
+
+    // [REMOVE] Remove I/O indicators and filenames from arguments
+    for (int i = remove_cnt - 1; i >= 0; --i) {
+        size_t pos = to_remove[i];      // the index of arg to remove
+        // printf("%lu %s\n", pos, args[pos]);
+        while (pos != *size) {
+            args[pos] = args[pos + 1];
+            ++pos;
+        }
+        --(*size);
+    }
+
+    return flag;
+}
+
+
+/*!
+ *   Open Target Files and Redirect I/O
+ *   @param: io_flag        the flag for IO redirection (bit 1 for output, bit 0 for input)
+ *   @param: input_file     file name for input
+ *   @param: output_file    file name for output
+ *   @param: input_decs     file descriptor of input file (like the file-opened object in Python)
+ *   @param: output_decs    file descriptor of output file (like the file-opened object in Python)
+ *   @return:               1 = successful, 0 = unsuccessful
+ */
+int redirect_io(unsigned io_flag, char *input_file, char *output_file, int *input_desc, int *output_desc) {
+#ifdef DEBUG
+    printf("[DEBUG] Redirecting I/O - IO flag: %u\n", io_flag);
+#endif
+    // open() & authorities: https://blog.csdn.net/sdhgood/article/details/39555311
+
+    // [OUTPUT] Redirect output
+    if (io_flag & 2) {
+        *output_desc = open(output_file, O_WRONLY | O_CREAT | O_TRUNC, 644);    // unmask auth
+        if (*output_desc < 0) {
+            fprintf(stderr, "[Error] Failed to open the output file: %s\n", output_file);
+            return 0;
+        }
+#ifdef DEBUG
+        printf("\"[DEBUG] Redirecting I/O - Output To: %s (opened as %d)\n", output_file, *output_desc);
+#endif
+        dup2(*output_desc, STDOUT_FILENO);
+    }
+
+    // [OUTPUT] Redirect output
+    if (io_flag & 1) { // redirecting input
+        *input_desc = open(input_file, O_RDONLY, 644);                          // unmask auth
+        if (*input_desc < 0) {
+            fprintf(stderr, "[Error] Failed to open the input file: %s\n", input_file);
+            return 0;
+        }
+#ifdef DEBUG
+        printf("[DEBUG] Redirecting I/O - Input from: %s (opened as %d)\n", input_file, *input_desc);
+#endif
+        dup2(*input_desc, STDIN_FILENO);
+    }
+
+
+    return 1;
+}
+
+
+/*!
+ *   Close Files for I/O Redirection
+ *   @param: io_flag        the flag for IO redirection (bit 1 for output, bit 0 for input)
+ *   @param: input_decs     file descriptor of input file
+ *   @param: output_decs    file descriptor of output file
+ */
+void close_file(unsigned io_flag, int input_desc, int output_desc) {
+    if (io_flag & 2) { close(output_desc); }
+    if (io_flag & 1) { close(input_desc); }
+}
+
+
+/*!
  * Run the Input Command, via Parsed Arguments
  * @param args                  arguments list
  * @param args_num              number of arguments
@@ -198,18 +311,21 @@ int run_command(char **args, size_t args_num) {
             //     fflush(stdin);
             // }
         }
-        else {    // no pipe
-            // /* Redirect I/O */
-            // char *input_file, *output_file;
-            // int input_desc, output_desc;
-            // unsigned io_flag = check_redirection(args, &args_num, &input_file,
-            //                                      &output_file);    // bit 1 for output, bit 0 for input
-            // if (redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc) == 0) {
-            //     return 0;
-            // }
+            // [PIPE] NO pipe
+        else {
+            /* Redirect I/O */
+            char *input_file, *output_file;
+            int input_desc, output_desc;
+            unsigned io_flag = check_io_redirection(
+                    args, &args_num, &input_file, &output_file);    // bit 1 for output, bit 0 for input
+            if (0 == redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc)) {
+                return 0;
+            }
             size_t exe_result = execvp(args[0], args);
-
-            // close_file(io_flag, input_desc, output_desc);
+#ifdef DEBUG
+            printf("[DEBUG] Execution End with Status %zu\n", exe_result);
+#endif
+            close_file(io_flag, input_desc, output_desc);
             fflush(stdin);
         }
     }
