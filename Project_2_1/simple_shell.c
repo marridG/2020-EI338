@@ -55,7 +55,7 @@ int get_input(char *command) {
             return 0;
         }
         // print the stored history, keep the command unchanged and exit
-        printf("%s", command);
+        printf("%s\n", command);
         return 1;
     }
 
@@ -468,6 +468,7 @@ int main(void) {
 
         // [RUN] Execute command
         run_command(args, args_num);
+        fflush(stdout);                 // flush the stream buffer
     }
 
 
