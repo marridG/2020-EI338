@@ -458,11 +458,11 @@ int main(void) {
         if (3 == args_num && strcmp(args[0], "--config") == 0 && strcmp(args[1], "debug") == 0) {
             if (strcmp(args[2], "true") == 0) {
                 DEBUG = 1;
-                printf("[CONFIG] Debug has been set to TRUE");
+                printf("[CONFIG] Debug has been set to TRUE\n");
             }
             else if (strcmp(args[2], "false") == 0) {
                 DEBUG = 0;
-                printf("[CONFIG] Debug has been set to FALSE");
+                printf("[CONFIG] Debug has been set to FALSE\n");
             }
             else {
                 fprintf(stderr, "[Error] Unknown Config Value of DEBUG. "
