@@ -12,7 +12,7 @@
 #define DELIMITERS " \t\n\v\f\r"        // Delimiters of Parts in Commands
 
 
-static int DEBUG = 0;
+static int DEBUG = 0;                   // DEBUG Mode Flag, whether to Show Hint Messages
 
 
 /*!
@@ -88,7 +88,6 @@ size_t parse_input(char *args[], char *original_command) {
         num++;
         token = strtok(NULL, DELIMITERS);
     }
-
 
     return num;
 }
@@ -440,7 +439,7 @@ int main(void) {
             for (size_t i = 0; i <= args_num - 1; i++) { printf("\t\"%s\"\n", args[i]); }
         }
 
-        // [INPUT] [Extra] Enable "exit" command
+        // [RUN] [Extra] Enable "exit" command
         if (strcmp(args[0], "exit") == 0) { break; }
 
         // [RUN] [Extra] Enable "?", "help", "-help", "--help" command
