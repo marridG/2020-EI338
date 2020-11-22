@@ -7,9 +7,13 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 
-#define DEBUG
+
 #define MAX_LINE 80                     // Maximum Command Length
 #define DELIMITERS " \t\n\v\f\r"        // Delimiters of Parts in Commands
+
+
+int DEBUG = 1;
+
 
 /*!
  *   Refresh the Content of Arguments, i.e., Free Old Contents and Set to NULL
@@ -99,6 +103,7 @@ void print_help_msg() {
            "These are common commands used in various situations:\n\n"
            "Control Commands\n"
            "  ?, help, -help, --help             Show the help messages\n"
+           "  --config debug true/false        Whether to show debug messages\n"
            "  exit                               Exit the simple UNIX shell\n"
            "\n"
            "Some other UNIX commands are also supported, you may try yourself\n");
@@ -120,7 +125,7 @@ int check_ampersand(char **args, size_t *size) {
     // check whether & is in the last argument
     if (args[*size - 1][len - 1] != '&') { return 0; }
 
-    // remove the whole last arg if arg=='&' exactly
+    // remove the whole last arg if arg=='&' exactly, should be if '&' is included
     if (len == 1) {
         free(args[*size - 1]);
         args[*size - 1] = NULL;
@@ -186,6 +191,11 @@ unsigned check_io_redirection(char **args, size_t *size, char **input_file, char
         --(*size);
     }
 
+    if (1 == DEBUG) {                   // print the processed args
+        printf("[DEBUG] I/O Redirection Check Done. Flag=%u, Processed Args are:\n", flag);
+        for (size_t i = 0; i <= *size - 1; i++) { printf("\t\"%s\"\n", args[i]); }
+    }
+
     return flag;
 }
 
@@ -200,9 +210,9 @@ unsigned check_io_redirection(char **args, size_t *size, char **input_file, char
  *   @return:               1 = successful, 0 = unsuccessful
  */
 int redirect_io(unsigned io_flag, char *input_file, char *output_file, int *input_desc, int *output_desc) {
-#ifdef DEBUG
-    printf("[DEBUG] Redirecting I/O - IO flag: %u\n", io_flag);
-#endif
+    if (1 == DEBUG) {
+        printf("[DEBUG] Redirecting I/O - IO flag: %u\n", io_flag);
+    }
     // open() & authorities: https://en.wikipedia.org/wiki/Umask
 
     // [OUTPUT] Redirect output
@@ -212,9 +222,9 @@ int redirect_io(unsigned io_flag, char *input_file, char *output_file, int *inpu
             fprintf(stderr, "[Error] Failed to open the output file: \"%s\"\n", output_file);
             return 0;
         }
-#ifdef DEBUG
-        printf("[DEBUG] Redirecting I/O - Output To: \"%s\" (opened as %d)\n", output_file, *output_desc);
-#endif
+        if (1 == DEBUG) {
+            printf("[DEBUG] Redirecting I/O - Output To: \"%s\" (opened as %d)\n", output_file, *output_desc);
+        }
         dup2(*output_desc, STDOUT_FILENO);
     }
 
@@ -225,9 +235,9 @@ int redirect_io(unsigned io_flag, char *input_file, char *output_file, int *inpu
             fprintf(stderr, "[Error] Failed to open the input file: \"%s\"\n", input_file);
             return 0;
         }
-#ifdef DEBUG
-        printf("[DEBUG] Redirecting I/O - Input from: \"%s\" (opened as %d)\n", input_file, *input_desc);
-#endif
+        if (1 == DEBUG) {
+            printf("[DEBUG] Redirecting I/O - Input from: \"%s\" (opened as %d)\n", input_file, *input_desc);
+        }
         dup2(*input_desc, STDIN_FILENO);
     }
 
@@ -245,16 +255,16 @@ int redirect_io(unsigned io_flag, char *input_file, char *output_file, int *inpu
 void close_file(unsigned io_flag, int input_desc, int output_desc) {
     if (io_flag & 2) {
         close(output_desc);
-#ifdef DEBUG
-        printf("[DEBUG] Redirected Output File (Opened as %d) Closed", output_desc);
-#endif
+        if (1 == DEBUG) {
+            printf("[DEBUG] Redirected Output File (Opened as %d) Closed", output_desc);
+        }
     }
 
     if (io_flag & 1) {
         close(input_desc);
-#ifdef DEBUG
-        printf("[DEBUG] Redirected Input File (Opened as %d) Closed", output_desc);
-#endif
+        if (1 == DEBUG) {
+            printf("[DEBUG] Redirected Input File (Opened as %d) Closed", output_desc);
+        }
     }
 }
 
@@ -269,14 +279,25 @@ void close_file(unsigned io_flag, int input_desc, int output_desc) {
  *   @param: args_num2      number of arguments for the second command
  */
 void check_pipe(char **args, size_t *args_num, char ***args2, size_t *args_num2) {
-    for (size_t i = 0; i != *args_num; ++i) {
+    int is_pipe = 0;
+    for (size_t i = 0; i <= *args_num - 1; ++i) {
         if (strcmp(args[i], "|") == 0) {
+            is_pipe = 1;
             free(args[i]);
             args[i] = NULL;
             *args_num2 = *args_num - i - 1;
             *args_num = i;
             *args2 = args + i + 1;
             break;
+        }
+    }
+
+    if (1 == DEBUG) {                   // print the result and split args if pipe is used
+        if (0 == is_pipe) printf("[DEBUG] Pipe Check Done. Pipe NOT Detected\n");
+        else {
+            printf("[DEBUG] Pipe Check Done. Pipe Detected, Split Args are:\n");
+            for (size_t i = 0; i <= *args_num - 1; i++) { printf("\targ_1 \"%s\"\n", args[i]); }
+            for (size_t i = 0; i <= *args_num2 - 1; i++) { printf("\targ_1 \"%s\"\n", *args2[i]); }
         }
     }
 }
@@ -372,9 +393,9 @@ int run_command(char **args, size_t args_num) {
             }
             // execute
             int exe_result = execvp(args[0], args);
-#ifdef DEBUG
-            printf("[DEBUG] Execution End with Status %d\n", exe_result);
-#endif
+            if (1 == DEBUG) {
+                printf("[DEBUG] Execution End with Status %d\n", exe_result);
+            }
             close_file(io_flag, input_desc, output_desc);
             fflush(stdin);
             if (-1 == exe_result) exit(0);      // https://blog.csdn.net/qq_39309971/article/details/80216007
@@ -412,25 +433,35 @@ int main(void) {
 
         // [INPUT] Get and store the input (notice that "empty" command ENTER is a success)
         if (!get_input(command)) { continue; }
-#ifdef DEBUG                            // print the stored input command
-        printf("[DEBUG] The input command is: \"%s\"\n", command);
-#endif
+        if (1 == DEBUG) {               // print the stored input command
+            printf("[DEBUG] The input command is: \"%s\"\n", command);
+        }
 
         // [INPUT] Parse the input command
         size_t args_num = parse_input(args, command);
         if (0 == args_num) { continue; }
-#ifdef DEBUG                            // print the stored parsed arguments of the nonempty input command
-        printf("[DEBUG] The parsed %zu arguments are:\n", args_num);
-        for (size_t i = 0; i <= args_num - 1; i++) { printf("\t\"%s\"\n", args[i]); }
-#endif
+        if (1 == DEBUG) {                // print the stored parsed arguments of the nonempty input command
+            printf("[DEBUG] The parsed %zu arguments are:\n", args_num);
+            for (size_t i = 0; i <= args_num - 1; i++) { printf("\t\"%s\"\n", args[i]); }
+        }
 
         // [INPUT] [Extra] Enable "exit" command
         if (strcmp(args[0], "exit") == 0) { break; }
 
-        // [INPUT] [Extra] Enable "?", "help", "-help", "--help" command
+        // [RUN] [Extra] Enable "?", "help", "-help", "--help" command
         if (strcmp(args[0], "?") == 0 || strcmp(args[0], "help") == 0 ||
             strcmp(args[0], "-help") == 0 || strcmp(args[0], "--help") == 0) {
             print_help_msg();
+            continue;
+        }
+        // [RUN] [Extra] Enable "--config debug true/false" command
+        if (3 == args_num && strcmp(args[0], "--config") == 0 && strcmp(args[1], "debug") == 0) {
+            if (strcmp(args[2], "true") == 0) { DEBUG = 1; }
+            else if (strcmp(args[2], "false") == 0) { DEBUG = 0; }
+            else {
+                fprintf(stderr, "[Error] Unknown Config Value of DEBUG. "
+                                "Expected \"true\" or \"false\", Got \"%s\"\n", args[2]);
+            }
             continue;
         }
 
