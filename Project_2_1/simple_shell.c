@@ -324,7 +324,7 @@ int run_command(char **args, size_t args_num) {
                 // redirect I/O
                 char *input_file, *output_file;
                 int input_desc, output_desc;
-                unsigned io_flag = check_redirection(
+                unsigned io_flag = check_io_redirection(
                         args2, &args_num2, &input_file, &output_file);    // bit 1 for output, bit 0 for input
                 io_flag &= 2;           // disable input redirection since input is provided from pipe
                 if (redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc) == 0) {
@@ -344,7 +344,7 @@ int run_command(char **args, size_t args_num) {
                 // redirect I/O
                 char *input_file, *output_file;
                 int input_desc, output_desc;
-                unsigned io_flag = check_redirection(
+                unsigned io_flag = check_io_redirection(
                         args, &args_num, &input_file, &output_file);    // bit 1 for output, bit 0 for input
                 io_flag &= 1;           // disable output redirection since output will be passed through pipe
                 if (redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc) == 0) {
