@@ -33,7 +33,7 @@ int get_input(char *command) {
 
     // read one line of inputs (length <= MAX_LINE) and store in buffer
     if (fgets(input_buffer, MAX_LINE + 1, stdin) == NULL) {
-        fprintf(stderr, "Failed to Read NULL Inputs\n");
+        fprintf(stderr, "[Error] Failed to Read NULL Inputs\n");
         return 0;
     }
 
@@ -137,6 +137,7 @@ int check_ampersand(char **args, size_t *size) {
 /*!
  *   Check the Redirection Symbols in the Arguments
  *      (1) remove "<", ">"         (2) remove the in-/out-put file arg
+ *      * Notice that it is assumed that only one of "<", ">" will appear at most once
  *   @param: args           arguments list
  *   @param: size           the number of arguments
  *   @param: input_file     file name for input
@@ -259,6 +260,28 @@ void close_file(unsigned io_flag, int input_desc, int output_desc) {
 
 
 /*!
+ *   Detect the Pipe Symbol '|' and split arguments into two parts accordingly
+ *      Notice that it is assumed that
+ *          (1) '|' will appear at most once    (2) no I/O redirection symbols will appear
+ *   @param: args           arguments list for the first command
+ *   @param: args_num       number of arguments for the first command
+ *   @param: args2          arguments list for the second command
+ *   @param: args_num2      number of arguments for the second command
+ */
+void check_pipe(char **args, size_t *args_num, char ***args2, size_t *args_num2) {
+    for (size_t i = 0; i != *args_num; ++i) {
+        if (strcmp(args[i], "|") == 0) {
+            free(args[i]);
+            args[i] = NULL;
+            *args_num2 = *args_num - i - 1;
+            *args_num = i;
+            *args2 = args + i + 1;
+            break;
+        }
+    }
+}
+
+/*!
  * Run the Input Command, via Parsed Arguments
  * @param args                  arguments list
  * @param args_num              number of arguments
@@ -268,63 +291,73 @@ int run_command(char **args, size_t args_num) {
     // [CONCURRENT] Detect '&' to determine whether to run concurrently
     int run_concurrently = check_ampersand(args, &args_num);
 
-    // [PIPE]
+    // [PIPE] Init, Check
     char **args2;
     size_t args_num2 = 0;
-    // detect_pipe(args, &args_num, &args2, &args_num2);
+    check_pipe(args, &args_num, &args2, &args_num2);
 
     // [EXECUTE] Create a child process
     pid_t pid = fork();
 
     // fork failed
     if (pid < 0) {
-        fprintf(stderr, "Failed to fork!\n");
+        fprintf(stderr, "[Error] Failed to fork the child process while executing\n");
         return 0;
     }
 
     // [PROCESS] child process
     if (pid == 0) {
-        if (args_num2 != 0) {    // pipe
-            // /* Create pipe */
-            // int fd[2];
-            // pipe(fd);
-            // /* Fork into another two processes */
-            // pid_t pid2 = fork();
-            // if (pid2 > 0) {  // child process for the second command
-            //     /* Redirect I/O */
-            //     char *input_file, *output_file;
-            //     int input_desc, output_desc;
-            //     unsigned io_flag = check_redirection(args2, &args_num2, &input_file,
-            //                                          &output_file);    // bit 1 for output, bit 0 for input
-            //     io_flag &= 2;   // disable input redirection
-            //     if (redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc) == 0) {
-            //         return 0;
-            //     }
-            //     close(fd[1]);
-            //     dup2(fd[0], STDIN_FILENO);
-            //     wait(NULL);     // wait for the first command to finish
-            //     execvp(args2[0], args2);
-            //     close_file(io_flag, input_desc, output_desc);
-            //     close(fd[0]);
-            //     fflush(stdin);
-            // }
-            // else if (pid2 == 0) {  // grandchild process for the first command
-            //     /* Redirect I/O */
-            //     char *input_file, *output_file;
-            //     int input_desc, output_desc;
-            //     unsigned io_flag = check_redirection(args, &args_num, &input_file,
-            //                                          &output_file);    // bit 1 for output, bit 0 for input
-            //     io_flag &= 1;   // disable output redirection
-            //     if (redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc) == 0) {
-            //         return 0;
-            //     }
-            //     close(fd[0]);
-            //     dup2(fd[1], STDOUT_FILENO);
-            //     execvp(args[0], args);
-            //     close_file(io_flag, input_desc, output_desc);
-            //     close(fd[1]);
-            //     fflush(stdin);
-            // }
+        // [PIPE] Using pipe
+        if (args_num2 != 0) {
+            // create pipe
+            int fd[2];
+            int pipe_create = pipe(fd);
+            if (-1 == pipe_create) {
+                fprintf(stderr, "[Error] Pipe Creation Failed\n");
+                return 0;
+            }
+
+            // fork grandchild & grand-grandchild process
+            pid_t pid2 = fork();
+            // grand-grandchild process - the second command of the pipe
+            if (pid2 > 0) {
+                // redirect I/O
+                char *input_file, *output_file;
+                int input_desc, output_desc;
+                unsigned io_flag = check_redirection(
+                        args2, &args_num2, &input_file, &output_file);    // bit 1 for output, bit 0 for input
+                io_flag &= 2;           // disable input redirection since input is provided from pipe
+                if (redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc) == 0) {
+                    return 0;
+                }
+                close(fd[1]);
+                dup2(fd[0], STDIN_FILENO);
+                wait(NULL);             // wait for the first command to finish
+                int exe_result = execvp(args2[0], args2);
+                close_file(io_flag, input_desc, output_desc);
+                close(fd[0]);
+                fflush(stdin);
+                if (-1 == exe_result) exit(0);
+            }
+                // grandchild process - the first command of the pipe
+            else if (0 == pid2) {
+                // redirect I/O
+                char *input_file, *output_file;
+                int input_desc, output_desc;
+                unsigned io_flag = check_redirection(
+                        args, &args_num, &input_file, &output_file);    // bit 1 for output, bit 0 for input
+                io_flag &= 1;           // disable output redirection since output will be passed through pipe
+                if (redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc) == 0) {
+                    return 0;
+                }
+                close(fd[0]);
+                dup2(fd[1], STDOUT_FILENO);
+                int exe_result = execvp(args[0], args);
+                close_file(io_flag, input_desc, output_desc);
+                close(fd[1]);
+                fflush(stdin);
+                if (-1 == exe_result) exit(0);
+            }
         }
 
             // [PIPE] NO pipe
