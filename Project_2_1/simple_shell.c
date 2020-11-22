@@ -291,15 +291,6 @@ void check_pipe(char **args, size_t *args_num, char ***args2, size_t *args_num2)
             break;
         }
     }
-
-    if (1 == DEBUG) {                   // print the result and split args if pipe is used
-        if (0 == is_pipe) printf("[DEBUG] Pipe Check Done. Pipe NOT Detected\n");
-        else {
-            printf("[DEBUG] Pipe Check Done. Pipe Detected, Split Args are:\n");
-            for (size_t i = 0; i <= *args_num - 1; i++) { printf("\targ_1 \"%s\"\n", args[i]); }
-            for (size_t i = 0; i <= *args_num2 - 1; i++) { printf("\targ_1 \"%s\"\n", *args2[i]); }
-        }
-    }
 }
 
 /*!
