@@ -192,8 +192,12 @@ unsigned check_io_redirection(char **args, size_t *size, char **input_file, char
     }
 
     if (1 == DEBUG) {                   // print the processed args
-        printf("[DEBUG] I/O Redirection Check Done. Flag=%u, Processed Args are:\n", flag);
-        for (size_t i = 0; i <= *size - 1; i++) { printf("\t\"%s\"\n", args[i]); }
+        if (0 == flag)
+            printf("[DEBUG] I/O Redirection Check Done. NOT Directed\n");
+        else {
+            printf("[DEBUG] I/O Redirection Check Done. Directed, flag=%u, Processed Args are:\n", flag);
+            for (size_t i = 0; i <= *size - 1; i++) { printf("\t\"%s\"\n", args[i]); }
+        }
     }
 
     return flag;
