@@ -12,7 +12,7 @@
 #define DELIMITERS " \t\n\v\f\r"        // Delimiters of Parts in Commands
 
 
-static int DEBUG = 1;
+static int DEBUG = 0;
 
 
 /*!
