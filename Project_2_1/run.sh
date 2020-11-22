@@ -7,49 +7,25 @@ echo "Entering simple_shell"
 
 echo "Pre-Designed Commands Set"
 ./simple_shell <<'EOF'
-!!
-echo DEBUG=False
-echo --config debug false
---config debug false
-!!
-
-echo -e "\n"
-echo ls
-ls
-echo ls > out.txt
-ls > out.txt
-echo cat < out.txt
-cat < out.txt
-
-echo -e "\n"
-echo ls | sort
-ls | sort
-echo cat < out.txt | sort > out_sorted.txt
-cat < out.txt | sort > out_sorted.txt
-echo cat out_sorted.txt
-cat out_sorted.txt
-
-echo -e "\n\n"
-echo "DEBUG=True"
---config debug true
-
-ls
-ls > out.txt
-cat < out.txt
-
-ls | sort
-cat < out.txt | sort > out_sorted.txt
-
---config debug false
-echo "Try Unrecognizable Commands, We can also Exit Shell by Calling \"exit\" Once"
-echo 123456
-123456
-echo 123 456 789
-123 456 789
-
 exit
 EOF
 
 echo ""
 echo "Now Try Your Commands"
 ./simple_shell
+
+#!!
+#--config debug false
+#!!
+#
+#ls
+#ls > out.txt
+#cat < out.txt
+#
+#ls | sort
+#cat < out.txt | sort > out_sorted.txt
+#cat out_sorted.txt
+#
+#echo "Try Unrecognizable Commands, We can also Exit Shell by Calling \"exit\" Once"
+#123456
+#123 456 789
