@@ -456,8 +456,14 @@ int main(void) {
         }
         // [RUN] [Extra] Enable "--config debug true/false" command
         if (3 == args_num && strcmp(args[0], "--config") == 0 && strcmp(args[1], "debug") == 0) {
-            if (strcmp(args[2], "true") == 0) { DEBUG = 1; }
-            else if (strcmp(args[2], "false") == 0) { DEBUG = 0; }
+            if (strcmp(args[2], "true") == 0) {
+                DEBUG = 1;
+                printf("[CONFIG] Debug has been set to TRUE");
+            }
+            else if (strcmp(args[2], "false") == 0) {
+                DEBUG = 0;
+                printf("[CONFIG] Debug has been set to FALSE");
+            }
             else {
                 fprintf(stderr, "[Error] Unknown Config Value of DEBUG. "
                                 "Expected \"true\" or \"false\", Got \"%s\"\n", args[2]);
