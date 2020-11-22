@@ -26,6 +26,6 @@ echo "Now Try Your Commands"
 #cat < out.txt | sort > out_sorted.txt
 #cat out_sorted.txt
 #
-#echo "Try Unrecognizable Commands, We can also Exit Shell by Calling \"exit\" Once"
+#echo "Try Unrecognizable Commands, We can also Exit Shell by Calling exit Once"
 #123456
 #123 456 789

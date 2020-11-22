@@ -30,7 +30,7 @@ EI338 Computer Systems Engineering, SJTU, 2020 Spring
 - [Experiment](#experiment)
     - [Test Script](#test-script)
     - [Test Commands](#test-commands)
-    - [Results](#results)
+    - [Test Results](#test-results)
 - [Summary](#summary)
 
 <!-- /MarkdownTOC -->
@@ -731,26 +731,26 @@ ls | sort
 cat < out.txt | sort > out_sorted.txt
 cat out_sorted.txt
 
-echo "Try Unrecognizable Commands, We can also Exit Shell by Calling \"exit\" Once"
+echo "Try Unrecognizable Commands, We can also Exit Shell by Calling exit Once"
 123456
 123 456 789
 ```
 
-<a id="results"></a>
-### Results
+<a id="test-results"></a>
+### Test Results
+The test results are shown below:  
+<center>
+    ![](pics/1.PNG)    
+</center>
 
-![123](pics/1.PNG)  
-<!-- Toy Tasks Outputs -->
-![123](pics/2.PNG)    
-<!-- Assignemnt 1 Outputs -->
-![123](pics/3.PNG)   
-<!-- Assignemnt 2 Outputs -->
+Additional screenshot illustrating the debug messages is given as follows:  
+<center>
+    ![](pics/2.PNG)
+</center>
 
 
 <br>
 
 <a id="summary"></a>
 ## Summary
-Generally speaking, the project tasks are somehow simple and straight-forward.
-
-However, since floating point operations are not recommended due to hardware architecture capability concerns (even though posiible on Linux), the "seconds" assignment results cannot be satisfactory enough (which now only support printing integer elapsed time).
+Generally speaking, the project tasks are more of a C language programming, about which I have forgotten most details. Thus, reference codes really do help me a lot.
