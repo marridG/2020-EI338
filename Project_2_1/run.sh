@@ -7,7 +7,7 @@ echo "Entering simple_shell"
 
 echo "Pre-Designed Commands Set"
 ./simple_shell <<'EOF'
-echo "DEBUG = False"
+echo "DEBUG=False"
 !!
 --config debug false
 !!
@@ -21,7 +21,7 @@ cat < out.txt | sort > out_sorted.txt
 cat out_sorted.txt
 
 
-echo "DEBUG = True"
+echo "DEBUG=True"
 !!
 --config debug true
 !!
