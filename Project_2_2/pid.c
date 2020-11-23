@@ -67,27 +67,19 @@ static ssize_t proc_read(struct file *file, char __user *usr_buf, size_t count, 
         return 0;
     }
 
-    // tsk = pid_task(find_vpid(PID), PIDTYPE_PID);
+    tsk = pid_task(find_vpid(PID), PIDTYPE_PID);
     completed = 1;
 
-    // obtain the <struct pid>, of the current PID
-    pid strct__pid__crt = find_vpid(PID);
-    if (NULL == pid){
-        printk(KERN_INFO "[Error] PID %d NOT Found at find_vpid()\n", PID);
+    if (NULL == tsk){
+        printk(KERN_INFO "[Error] PID %d NOT Found at pid_task()\n", PID);
         return 0;
     }
     else {
-        // obtain the <struct task_struct.>, of the current PID
-        task_struct strct__tsk_strct__crt = pid_task(strct__pid__crt, PIDTYPE_PID);
-        if (NULL == strct__tsk_strct__crt){
-            printk(KERN_INFO "[Error] PID %d NOT Found at pid_task()\n", PID);
-            return 0;
-        }
-
         rv = sprintf(buffer, BUFFER_SIZE,
                      "command = [%s] pid = [%d] state = [%ld]\n",
-                     (strct__tsk_strct__crt->comm, PID, strct__tsk_strct__crt->state);
+                     (tsk->comm, PID, tsk->state);
     }
+
 
     // copies the contents of kernel buffer to userspace usr_buf
     if (copy_to_user(usr_buf, buffer, rv)) {
