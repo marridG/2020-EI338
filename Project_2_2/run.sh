@@ -20,12 +20,16 @@ echo "\tModule Installed"
 
 echo "Testing PID = 1395"
 echo "1395" > /proc/pid
-sleep 5
+cat /proc/pid
+echo
+
+echo "Testing PID = 2023"
+echo "2023" > /proc/pid
 cat /proc/pid
 echo
 
 echo "Testing PID = 1671"
-echo "7346" > /proc/pid
+echo "1671" > /proc/pid
 cat /proc/pid
 echo
 
