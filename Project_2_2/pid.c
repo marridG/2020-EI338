@@ -111,7 +111,7 @@ static ssize_t proc_write(struct file *file, const char __user *usr_buf, size_t 
      * sscanf() must be used instead.
      */
     sscanf(k_mem, "%d", &PID);
-    printk(KERN_INFO "Current PID is now %l\n", PID);
+    printk(KERN_INFO "Current PID is now %d\n", PID);
 
     // release memory
     kfree(k_mem);
