@@ -69,18 +69,14 @@ static ssize_t proc_read(struct file *file, char __user *usr_buf, size_t count, 
     }
 
     tsk = pid_task(find_vpid(l_pid), PIDTYPE_PID);
-
     completed = 1;
 
     // copies the contents of kernel buffer to userspace usr_buf
-    if (
-    copy_to_user(usr_buf, buffer, rv
-    )) {
-    rv = -1;
+    if (copy_to_user(usr_buf, buffer, rv)) {
+        rv = -1;
     }
 
-    return
-    rv;
+    return rv;
 }
 
 /**
@@ -89,13 +85,12 @@ static ssize_t proc_read(struct file *file, char __user *usr_buf, size_t count, 
 static ssize_t proc_write(struct file *file, const char __user *usr_buf, size_t count, loff_t *pos) {
     char *k_mem;
 
-    // allocate kernel memory
+    // allocate kernel memory - routine kernel memory allocation
     k_mem = kmalloc(count, GFP_KERNEL);
 
-    /* copies user space usr_buf to kernel buffer */
+    // copies user space "usr_buf" to kernel buffer
     if (copy_from_user(k_mem, usr_buf, count)) {
-        printk( KERN_INFO
-        "Error copying from user\n");
+        printk(KERN_INFO "Error copying from user\n");
         return -1;
     }
 
@@ -106,6 +101,7 @@ static ssize_t proc_write(struct file *file, const char __user *usr_buf, size_t 
      * sscanf() must be used instead.
      */
 
+    // release memory
     kfree(k_mem);
 
     return count;
