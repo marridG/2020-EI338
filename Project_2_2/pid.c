@@ -67,7 +67,7 @@ static ssize_t proc_read(struct file *file, char __user *usr_buf, size_t count, 
         return 0;
     }
 
-    tsk = pid_task(find_vpid(PID), PIDTYPE_PID);
+    // tsk = pid_task(find_vpid(PID), PIDTYPE_PID);
     completed = 1;
 
     // obtain the <struct pid>, of the current PID
