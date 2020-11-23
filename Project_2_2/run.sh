@@ -18,7 +18,7 @@ insmod pid_module.ko
 dmesg
 echo "\tModule Installed"
 
-for i in 1 11 21 40 1000 666
+for i in 1 11 21 40 100 666
 do
     echo "Testing PID = $i"
     echo $i > /proc/pid
