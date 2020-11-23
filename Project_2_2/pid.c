@@ -16,8 +16,7 @@
 #define BUFFER_SIZE 128
 #define PROC_NAME "pid"
 
-/* the current pid */
-static long l_pid;
+static int PID;                      // the current pid
 
 /**
  * Function prototypes
@@ -71,6 +70,25 @@ static ssize_t proc_read(struct file *file, char __user *usr_buf, size_t count, 
     tsk = pid_task(find_vpid(l_pid), PIDTYPE_PID);
     completed = 1;
 
+    // obtain the <struct pid>, of the current PID
+    pid strct__pid__crt = find_vpid(PID);
+    if (NULL == pid){
+        printk(KERN_INFO "[Error] PID %d NOT Found at find_vpid()\n", PID);
+        return 0;
+    }
+    else {
+        // obtain the <struct task_struct.>, of the current PID
+        task_struct strct__tsk_strct__crt = pid_task(strct__pid__crt, PIDTYPE_PID);
+        if (NULL == strct__tsk_strct__crt){
+            printk(KERN_INFO "[Error] PID %d NOT Found at pid_task()\n", PID);
+            return 0;
+        }
+
+        rv = sprintf(buffer, BUFFER_SIZE,
+                     "command = [%s] pid = [%d] state = [%ld]\n",
+                     (strct__tsk_strct__crt->comm, PID, strct__tsk_strct__crt->state);
+    }
+
     // copies the contents of kernel buffer to userspace usr_buf
     if (copy_to_user(usr_buf, buffer, rv)) {
         rv = -1;
@@ -95,11 +113,13 @@ static ssize_t proc_write(struct file *file, const char __user *usr_buf, size_t 
     }
 
     /**
-      * kstrol() will not work because the strings are not guaranteed
+     * kstrol() will not work because the strings are not guaranteed
      * to be null-terminated.
      *
      * sscanf() must be used instead.
      */
+    sscanf(k_mem, "%d", &PID);
+    printk(KERN_INFO "Current PID is now %l\n", PID);
 
     // release memory
     kfree(k_mem);
