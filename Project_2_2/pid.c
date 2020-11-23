@@ -27,7 +27,7 @@ static ssize_t proc_write(struct file *file, const char __user *usr_buf, size_t 
 static struct file_operations proc_ops = {
         .owner = THIS_MODULE,
         .read = proc_read,
-        .write = proc write,
+        .write = proc_write,
 };
 
 /* This function is called when the module is loaded. */
