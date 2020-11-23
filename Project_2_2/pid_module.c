@@ -68,8 +68,6 @@ static ssize_t proc_read(struct file *file, char __user *usr_buf, size_t count, 
     }
 
     tsk = pid_task(find_vpid(PID), PIDTYPE_PID);
-    completed = 1;
-
     if (NULL == tsk){
         printk(KERN_INFO "[Error] PID %d NOT Found at pid_task()\n", PID);
         return 0;
@@ -80,6 +78,7 @@ static ssize_t proc_read(struct file *file, char __user *usr_buf, size_t count, 
                      tsk->comm, PID, tsk->state);
     }
 
+    completed = 1;
 
     // copies the contents of kernel buffer to userspace usr_buf
     if (copy_to_user(usr_buf, buffer, rv)) {
