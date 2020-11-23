@@ -16,7 +16,7 @@
 #define BUFFER_SIZE 128
 #define PROC_NAME "pid"
 
-static int PID;                      // the current pid
+static int PID_CRT_INT;                      // the current pid
 
 /**
  * Function prototypes
@@ -67,15 +67,15 @@ static ssize_t proc_read(struct file *file, char __user *usr_buf, size_t count, 
         return 0;
     }
 
-    tsk = pid_task(find_vpid(PID), PIDTYPE_PID);
+    tsk = pid_task(find_vpid(PID_CRT_INT), PIDTYPE_PID);
     if (NULL == tsk){
-        printk(KERN_INFO "[Error] PID %d NOT Found at pid_task()\n", PID);
+        printk(KERN_INFO "[Error] PID %d NOT Found\n", PID_CRT_INT);
         return 0;
     }
     else {
         rv = sprintf(buffer,
                      "command = [%s] pid = [%d] state = [%ld]\n",
-                     tsk->comm, PID, tsk->state);
+                     tsk->comm, PID_CRT_INT, tsk->state);
     }
 
     completed = 1;
@@ -109,8 +109,8 @@ static ssize_t proc_write(struct file *file, const char __user *usr_buf, size_t 
      *
      * sscanf() must be used instead.
      */
-    sscanf(k_mem, "%d", &PID);
-    printk(KERN_INFO "Current PID is now %d\n", PID);
+    sscanf(k_mem, "%d", &PID_CRT_INT);
+    printk(KERN_INFO "Current PID is now %d\n", PID_CRT_INT);
 
     // release memory
     kfree(k_mem);
