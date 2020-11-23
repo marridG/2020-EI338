@@ -75,7 +75,7 @@ static ssize_t proc_read(struct file *file, char __user *usr_buf, size_t count, 
         return 0;
     }
     else {
-        rv = sprintf(buffer, BUFFER_SIZE,
+        rv = sprintf(buffer,
                      "command = [%s] pid = [%d] state = [%ld]\n",
                      tsk->comm, PID, tsk->state);
     }
