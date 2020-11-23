@@ -9,7 +9,7 @@ make
 echo "Initialized"
 
 
-# Exercises on Page P-4
+# Exercises on Page P-15
 echo "Running Codes for Project 2-2 on Page P-15"
 
 # install module
@@ -18,20 +18,12 @@ insmod pid_module.ko
 dmesg
 echo "\tModule Installed"
 
-echo "Testing PID = 1395"
-echo "1395" > /proc/pid
-cat /proc/pid
-echo
-
-echo "Testing PID = 2023"
-echo "2023" > /proc/pid
-cat /proc/pid
-echo
-
-echo "Testing PID = 1671"
-echo "1671" > /proc/pid
-cat /proc/pid
-echo
+for i in 1 11 21 40 1000 666
+do
+    echo "Testing PID = $i"
+    echo $i > /proc/pid
+    cat /proc/pid
+done
 
 # remove module
 echo "\tRemoving Module"
