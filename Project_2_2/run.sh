@@ -24,21 +24,8 @@ sleep 5
 cat /proc/pid
 echo
 
-echo "Testing PID = 7346"
+echo "Testing PID = 1671"
 echo "7346" > /proc/pid
-sleep 5
-cat /proc/pid
-echo
-
-echo "Testing PID = 3422"
-echo "3422" > /proc/pid
-sleep 5
-cat /proc/pid
-echo
-
-echo "Testing PID = 6752"
-echo "6752" > /proc/pid
-sleep 5
 cat /proc/pid
 echo
 
