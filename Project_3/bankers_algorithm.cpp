@@ -23,7 +23,7 @@ void output_values();
 int is_leq(const int *opr_1, const int *opr_2, int len);
 int state_is_safe();
 int request_resources(int customer_idx, const int *request);
-void release_resources(int customer_num, int release);
+int release_resources(int customer_idx, const int *release);
 
 
 int main(int argc, char *argv[]) {
@@ -44,30 +44,42 @@ int main(int argc, char *argv[]) {
         return 0;
     printf(">");
 
-    char op[5] = "";// commands: RQ, RL, * (STAT in proj 4)
-    int op_success = 0;
+    char op[5] = "";                            // commands: RQ, RL, * (STAT in proj 4)
+    int op_success = -1;                        // operation succeeds: 0=×,1=√,-1=?
     while (1 == scanf("%s", op)) {
-        if (strcmp(op, "RQ") == 0) {    // request resources
-            int customer_idx = -1;
-            int request[NUM_RESOURCES];
+        op_success = -1;
+        int customer_idx = -1;
+        int request[NUM_RESOURCES];
+
+        if (strcmp(op, "RQ") == 0) {            // request resources
             scanf("%d", &customer_idx);
             for (int i = 0; i <= NUM_RESOURCES - 1; ++i) {
                 scanf("%d", &request[i]);
             }
             op_success = (0 == request_resources(customer_idx, request));
         }
-        else if (strcmp(op, "RL") == 0) {
-            // release_wrapper();
+
+        else if (strcmp(op, "RL") == 0) {       // release resources
+            scanf("%d", &customer_idx);
+            for (int i = 0; i <= NUM_RESOURCES - 1; ++i) {
+                scanf("%d", &request[i]);
+            }
+            op_success = (0 == release_resources(customer_idx, request));
         }
-        else if (strcmp(op, "*") == 0) {
+
+        else if (strcmp(op, "*") == 0) {        // output values
             output_values();
+            op_success = -1;
         }
-        else {
+
+        else {                                  // invalid operation identifier
             printf("[Error] Invalid Operation Identifier.\n");
+            op_success = -1;
         }
-        if (op_success) printf("SUCCESS.\n");
-        else printf("DENIED.\n");
-        printf("> ");
+
+        if (1 == op_success) printf("SUCCESS.\n");
+        else if (0 == op_success) printf("DENIED.\n");
+        printf(">");
     }
 
     return 0;
@@ -111,7 +123,7 @@ int init(int argc, char *argv[], const char *resources_file) {
 }
 
 /*!
- * Process Request Resources
+ * React when Processes Request Resources
  * @param customer_idx      request customer index
  * @param request           requested resources amount
  * @return                  0 if success; negative otherwise
@@ -130,7 +142,9 @@ int request_resources(int customer_idx, const int *request) {
         return -3;
     }
 
+#ifdef DEBUG
     output_values();
+#endif
     // try to allocate
     for (int r = 0; r <= NUM_RESOURCES - 1; r++) {
         available[r] -= request[r];
@@ -140,7 +154,9 @@ int request_resources(int customer_idx, const int *request) {
     int success = (1 == state_is_safe());
     if (1 == success) { return 0; }
     // if unsafe, restore the unsafe allocation
+#ifdef DEBUG
     output_values();
+#endif
     for (int r = 0; r <= NUM_RESOURCES - 1; r++) {
         available[r] += request[r];
         allocation[customer_idx][r] -= request[r];
@@ -148,6 +164,37 @@ int request_resources(int customer_idx, const int *request) {
     }
     printf("[Error] Allocation Unsafe. ");
     return -4;
+}
+
+/*!
+ * React when Processes Release Resources
+ * @param customer_idx      release request customer index
+ * @param release           requested released resources amount
+ * @return                  0 if success; negative otherwise
+ */
+int release_resources(int customer_idx, const int *release) {
+    if (customer_idx < 0 || customer_idx > NUM_CUSTOMERS - 1) {
+        printf("[Error] Invalid Customer Index. ");
+        return -1;
+    }
+    if (0 == is_leq(release, allocation[customer_idx], NUM_RESOURCES)) {
+        printf("[Error] Alloaction Exceeded. ");
+        return -2;
+    }
+
+#ifdef DEBUG
+    output_values();
+#endif
+    // release
+    for (int r = 0; r <= NUM_RESOURCES - 1; r++) {
+        available[r] += release[r];
+        allocation[customer_idx][r] -= release[r];
+    }
+#ifdef DEBUG
+    output_values();
+#endif
+
+    return 0;
 }
 
 
