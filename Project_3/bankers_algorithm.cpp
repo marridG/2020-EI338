@@ -5,7 +5,7 @@
 using namespace std;
 
 
-#define DEBUG
+// #define DEBUG
 
 
 const int NUM_CUSTOMERS = 5;
