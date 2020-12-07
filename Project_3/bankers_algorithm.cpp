@@ -248,9 +248,7 @@ int state_is_safe() {
         }
         if (1 == is_all_true) { return 1; }
     }
-    cout << endl;
-    for (int j = 0; j <= NUM_CUSTOMERS - 1; j++)
-        cout << finish[j] << " ";
+
     return 0;
 }
 
