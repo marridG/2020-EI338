@@ -22,7 +22,6 @@ int init(int argc, char *argv[], const char *resources_file);
 void output_values();
 int request_resources(int customer_num, int request[]);
 void release_resources(int customer_num, int release[]);
-int state_is_safe(int *in_avail, int *in_alloc, int *in_need);
 
 
 int main(int argc, char *argv[]) {
@@ -63,6 +62,13 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
+/*!
+ * Init: Parse & Store Input AVAILABLE Values, Read MAX from File
+ * @param argc              number of arguments
+ * @param argv              arguments
+ * @param resources_file    file in which MAX is stored
+ * @return                  0 if success; egative otherwise
+ */
 int init(int argc, char *argv[], const char *resources_file) {
     if (1 + NUM_RESOURCES != argc) {
         printf("Incorrect number of parameters.\n");
@@ -92,7 +98,15 @@ int init(int argc, char *argv[], const char *resources_file) {
     return 0;
 }
 
-int is_leq(int *opr_1, int *opr_2, int len) {
+
+/*!
+ * Judge whether list A <= B Element-wise
+ * @param opr_1             list A
+ * @param opr_2             list B
+ * @param len               length of the list (len(A)=len(B))
+ * @return                  1 if (A<=B).all(); 0 otherwise
+ */
+int is_leq(const int *opr_1, const int *opr_2, int len) {
     for (int i = 0; i <= len - 1; i++) {
         if (opr_1[i] > opr_2[i]) {
             return 0;
@@ -101,6 +115,13 @@ int is_leq(int *opr_1, int *opr_2, int len) {
     return 1;
 }
 
+/*!
+ * Judge by Safety Algorithm whether a State is Safe
+ * @param in_avail          input AVAILABLE values
+ * @param in_alloc          input ALLOCATION values
+ * @param in_need           input NEED values
+ * @return                  1 if safe; 0 if unsafe
+ */
 int state_is_safe(int *in_avail, int *in_alloc, int *in_need) {
     int work[NUM_RESOURCES], finish[NUM_CUSTOMERS];
     memcpy(work, available, NUM_RESOURCES * sizeof(int));
@@ -125,6 +146,9 @@ int state_is_safe(int *in_avail, int *in_alloc, int *in_need) {
     return 1;
 }
 
+/*!
+ * Output Values: AVAILABLE, MAX, ALLOCATION, NEED
+ */
 void output_values() {
     string indent = "    ";
     string end_of_field = "";
