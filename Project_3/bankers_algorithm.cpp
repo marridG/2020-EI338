@@ -74,8 +74,6 @@ int init(int argc, char *argv[], const char *resources_file) {
     return 0;
 }
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "modernize-loop-convert"
 
 void output_values() {
     string indent = "    ";
@@ -124,5 +122,3 @@ void output_values() {
     printf("==============================\n");
     printf("==============================\n");
 }
-
-#pragma clang diagnostic pop
