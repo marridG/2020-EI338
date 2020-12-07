@@ -22,6 +22,7 @@ int init(int argc, char *argv[], const char *resources_file);
 void output_values();
 int request_resources(int customer_num, int request[]);
 void release_resources(int customer_num, int release[]);
+int state_is_safe(int *in_avail, int *in_alloc, int *in_need);
 
 
 int main(int argc, char *argv[]) {
@@ -69,7 +70,7 @@ int init(int argc, char *argv[], const char *resources_file) {
     }
 
     // store the input values of AVAILABLE
-    for (int i = 0; i < NUM_RESOURCES; i++) {
+    for (int i = 0; i <= NUM_RESOURCES - 1; i++) {
         available[i] = atoi(argv[i + 1]);
     }
 
@@ -80,7 +81,7 @@ int init(int argc, char *argv[], const char *resources_file) {
         return -2;
     }
     for (int c = 0; c < NUM_CUSTOMERS; c++) {
-        for (int r = 0; r < NUM_RESOURCES; r++) {
+        for (int r = 0; r <= NUM_RESOURCES - 1; r++) {
             fscanf(f, "%d", &maximum[c][r]);
             need[c][r] = maximum[c][r];
         }
@@ -91,6 +92,38 @@ int init(int argc, char *argv[], const char *resources_file) {
     return 0;
 }
 
+int is_leq(int *opr_1, int *opr_2, int len) {
+    for (int i = 0; i <= len - 1; i++) {
+        if (opr_1[i] > opr_2[i]) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int state_is_safe(int *in_avail, int *in_alloc, int *in_need) {
+    int work[NUM_RESOURCES], finish[NUM_CUSTOMERS];
+    memcpy(work, available, NUM_RESOURCES * sizeof(int));
+    memset(finish, 0, NUM_CUSTOMERS * sizeof(int));
+
+    for (int finished_cnt = 0; finished_cnt <= NUM_CUSTOMERS - 1; finished_cnt++) {
+        int flag_found = 0;
+        for (int i = 0; i <= NUM_CUSTOMERS - 1; i++) {
+            if (!finish[i] && is_leq(need[i], work, NUM_RESOURCES)) {
+                flag_found = 1;
+                for (int j = 0; j <= NUM_RESOURCES - 1; j++) {
+                    work[j] += allocation[i][j];
+                }
+                finish[i] = 1;
+                break;
+            }
+        }
+        if (!flag_found) {
+            return 0;
+        }
+    }
+    return 1;
+}
 
 void output_values() {
     string indent = "    ";
@@ -102,16 +135,16 @@ void output_values() {
     // AVAILABLE: Available Resources
     printf("AVAILABLE - Shape (%d,)\n", NUM_RESOURCES);
     printf("%s", indent.c_str());
-    for (int i = 0; i < NUM_RESOURCES; i++) {
+    for (int i = 0; i <= NUM_RESOURCES - 1; i++) {
         printf("%d ", available[i]);
     }
     printf("\n%s", end_of_field.c_str());
 
     // MAX: Maximum Resources for Each Customer
     printf("MAX - Shape (%d, %d)\n", NUM_CUSTOMERS, NUM_RESOURCES);
-    for (int c = 0; c < NUM_CUSTOMERS; c++) {
+    for (int c = 0; c <= NUM_CUSTOMERS - 1; c++) {
         printf("%s", indent.c_str(), c);
-        for (int r = 0; r < NUM_RESOURCES; r++) {
+        for (int r = 0; r <= NUM_RESOURCES - 1; r++) {
             printf("%d ", maximum[c][r]);
         }
         printf("\n");
@@ -120,9 +153,9 @@ void output_values() {
 
     // ALLOCATION: Allocated Resources for Each Customer
     printf("ALLOCATION - Shape (%d, %d)\n", NUM_CUSTOMERS, NUM_RESOURCES);
-    for (int c = 0; c != NUM_CUSTOMERS; c++) {
+    for (int c = 0; c <= NUM_CUSTOMERS - 1; c++) {
         printf("%s", indent.c_str(), c);
-        for (int r = 0; r < NUM_RESOURCES; r++) {
+        for (int r = 0; r <= NUM_RESOURCES - 1; r++) {
             printf("%d ", allocation[c][r]);
         }
         printf("\n");
@@ -131,9 +164,9 @@ void output_values() {
 
     // NEED: Needed Resources for Each Customer
     printf("NEED - Shape (%d, %d)\n", NUM_CUSTOMERS, NUM_RESOURCES);
-    for (int c = 0; c < NUM_CUSTOMERS; c++) {
+    for (int c = 0; c <= NUM_CUSTOMERS - 1; c++) {
         printf("%s", indent.c_str(), c);
-        for (int r = 0; r < NUM_RESOURCES; r++) {
+        for (int r = 0; r <= NUM_RESOURCES - 1; r++) {
             printf("%d ", need[c][r]);
         }
         printf("\n");
