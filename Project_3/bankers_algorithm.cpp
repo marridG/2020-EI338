@@ -106,7 +106,7 @@ int init(int argc, char *argv[], const char *resources_file) {
 
     // get MAX values from the init file
     FILE *f = fopen(resources_file, "r");
-    if (nullptr == f) {
+    if (NULL == f) {                            // nullptr possibly not supported by the compiler
         printf("Unable to open file: %s\n", resources_file);
         return -2;
     }
