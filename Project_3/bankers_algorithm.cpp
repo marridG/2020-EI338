@@ -38,9 +38,26 @@ int main(int argc, char *argv[]) {
     argv[4] = arg5;
 #endif
 
-    init(argc, argv, INIT_FILENAME);
-    output_values();
+    if (0 != init(argc, argv, INIT_FILENAME))
+        return 0;
+    printf(">");
 
+    char op[5] = "";// commands: RQ, RL, * (STAT in proj 4)
+    while (1 == scanf("%s", op)) {
+        if (strcmp(op, "RQ") == 0) {
+            // request_wrapper();
+        }
+        else if (strcmp(op, "RL") == 0) {
+            // release_wrapper();
+        }
+        else if (strcmp(op, "*") == 0) {
+            output_values();
+        }
+        else {
+            // display_usage();
+        }
+        printf("> ");
+    }
 
     return 0;
 }
@@ -79,22 +96,24 @@ void output_values() {
     string indent = "    ";
     string end_of_field = "";
     printf("==============================\n");
-    printf("%sValues Report\n", indent.c_str());
+    printf("Values Report\n");
     printf("==============================\n%s", end_of_field.c_str());
 
     // AVAILABLE: Available Resources
     printf("AVAILABLE - Shape (%d,)\n", NUM_RESOURCES);
     printf("%s", indent.c_str());
-    for (int i = 0; i < NUM_RESOURCES; i++)
+    for (int i = 0; i < NUM_RESOURCES; i++) {
         printf("%d ", available[i]);
+    }
     printf("\n%s", end_of_field.c_str());
 
     // MAX: Maximum Resources for Each Customer
     printf("MAX - Shape (%d, %d)\n", NUM_CUSTOMERS, NUM_RESOURCES);
     for (int c = 0; c < NUM_CUSTOMERS; c++) {
-        printf("%s[%d] ", indent.c_str(), c);
-        for (int r = 0; r < NUM_RESOURCES; r++)
+        printf("%s", indent.c_str(), c);
+        for (int r = 0; r < NUM_RESOURCES; r++) {
             printf("%d ", maximum[c][r]);
+        }
         printf("\n");
     }
     printf("%s", end_of_field.c_str());
@@ -102,9 +121,10 @@ void output_values() {
     // ALLOCATION: Allocated Resources for Each Customer
     printf("ALLOCATION - Shape (%d, %d)\n", NUM_CUSTOMERS, NUM_RESOURCES);
     for (int c = 0; c != NUM_CUSTOMERS; c++) {
-        printf("%s[%d] ", indent.c_str(), c);
-        for (int r = 0; r < NUM_RESOURCES; r++)
+        printf("%s", indent.c_str(), c);
+        for (int r = 0; r < NUM_RESOURCES; r++) {
             printf("%d ", allocation[c][r]);
+        }
         printf("\n");
     }
     printf("%s", end_of_field.c_str());
@@ -112,9 +132,10 @@ void output_values() {
     // NEED: Needed Resources for Each Customer
     printf("NEED - Shape (%d, %d)\n", NUM_CUSTOMERS, NUM_RESOURCES);
     for (int c = 0; c < NUM_CUSTOMERS; c++) {
-        printf("%s[%d] ", indent.c_str(), c);
-        for (int r = 0; r < NUM_RESOURCES; r++)
+        printf("%s", indent.c_str(), c);
+        for (int r = 0; r < NUM_RESOURCES; r++) {
             printf("%d ", need[c][r]);
+        }
         printf("\n");
     }
     printf("%s", end_of_field.c_str());
