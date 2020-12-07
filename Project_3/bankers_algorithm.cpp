@@ -20,8 +20,10 @@ int need[NUM_CUSTOMERS][NUM_RESOURCES];         // remaining need of each custom
 
 int init(int argc, char *argv[], const char *resources_file);
 void output_values();
-int request_resources(int customer_num, int request[]);
-void release_resources(int customer_num, int release[]);
+int is_leq(const int *opr_1, const int *opr_2, int len);
+int state_is_safe();
+int request_resources(int customer_idx, const int *request);
+void release_resources(int customer_num, int release);
 
 
 int main(int argc, char *argv[]) {
@@ -30,7 +32,7 @@ int main(int argc, char *argv[]) {
     strcpy(INIT_FILENAME, "../Project_3/init.txt");
     argc = 5;
     char arg1[18] = "bankers_algorithm";
-    char arg2[3] = "10", arg3[2] = "5", arg4[2] = "7", arg5[2] = "8";
+    char arg2[3] = "10", arg3[2] = "6", arg4[2] = "7", arg5[2] = "8";
     argv[0] = arg1;
     argv[1] = arg2;
     argv[2] = arg3;
@@ -43,9 +45,16 @@ int main(int argc, char *argv[]) {
     printf(">");
 
     char op[5] = "";// commands: RQ, RL, * (STAT in proj 4)
+    int op_success = 0;
     while (1 == scanf("%s", op)) {
-        if (strcmp(op, "RQ") == 0) {
-            // request_wrapper();
+        if (strcmp(op, "RQ") == 0) {    // request resources
+            int customer_idx = -1;
+            int request[NUM_RESOURCES];
+            scanf("%d", &customer_idx);
+            for (int i = 0; i <= NUM_RESOURCES - 1; ++i) {
+                scanf("%d", &request[i]);
+            }
+            op_success = (0 == request_resources(customer_idx, request));
         }
         else if (strcmp(op, "RL") == 0) {
             // release_wrapper();
@@ -54,20 +63,23 @@ int main(int argc, char *argv[]) {
             output_values();
         }
         else {
-            // display_usage();
+            printf("[Error] Invalid Operation Identifier.\n");
         }
+        if (op_success) printf("SUCCESS.\n");
+        else printf("DENIED.\n");
         printf("> ");
     }
 
     return 0;
 }
 
+
 /*!
  * Init: Parse & Store Input AVAILABLE Values, Read MAX from File
  * @param argc              number of arguments
  * @param argv              arguments
  * @param resources_file    file in which MAX is stored
- * @return                  0 if success; egative otherwise
+ * @return                  0 if success; negative otherwise
  */
 int init(int argc, char *argv[], const char *resources_file) {
     if (1 + NUM_RESOURCES != argc) {
@@ -98,6 +110,46 @@ int init(int argc, char *argv[], const char *resources_file) {
     return 0;
 }
 
+/*!
+ * Process Request Resources
+ * @param customer_idx      request customer index
+ * @param request           requested resources amount
+ * @return                  0 if success; negative otherwise
+ */
+int request_resources(int customer_idx, const int *request) {
+    if (customer_idx < 0 || customer_idx > NUM_CUSTOMERS - 1) {
+        printf("[Error] Invalid Customer Index. ");
+        return -1;
+    }
+    if (0 == is_leq(request, need[customer_idx], NUM_RESOURCES)) {
+        printf("[Error] Maximum Claim Exceeded. ");
+        return -2;
+    }
+    if (0 == is_leq(request, available, NUM_RESOURCES)) {
+        printf("[Error] Insufficient Available Resources. ");
+        return -3;
+    }
+
+    output_values();
+    // try to allocate
+    for (int r = 0; r <= NUM_RESOURCES - 1; r++) {
+        available[r] -= request[r];
+        allocation[customer_idx][r] += request[r];
+        need[customer_idx][r] -= request[r];
+    }
+    int success = (1 == state_is_safe());
+    if (1 == success) { return 0; }
+    // if unsafe, restore the unsafe allocation
+    output_values();
+    for (int r = 0; r <= NUM_RESOURCES - 1; r++) {
+        available[r] += request[r];
+        allocation[customer_idx][r] -= request[r];
+        need[customer_idx][r] += request[r];
+    }
+    printf("[Error] Allocation Unsafe. ");
+    return -4;
+}
+
 
 /*!
  * Judge whether list A <= B Element-wise
@@ -117,20 +169,18 @@ int is_leq(const int *opr_1, const int *opr_2, int len) {
 
 /*!
  * Judge by Safety Algorithm whether a State is Safe
- * @param in_avail          input AVAILABLE values
- * @param in_alloc          input ALLOCATION values
- * @param in_need           input NEED values
  * @return                  1 if safe; 0 if unsafe
  */
-int state_is_safe(int *in_avail, int *in_alloc, int *in_need) {
+int state_is_safe() {
     int work[NUM_RESOURCES], finish[NUM_CUSTOMERS];
     memcpy(work, available, NUM_RESOURCES * sizeof(int));
     memset(finish, 0, NUM_CUSTOMERS * sizeof(int));
 
-    for (int finished_cnt = 0; finished_cnt <= NUM_CUSTOMERS - 1; finished_cnt++) {
-        int flag_found = 0;
+    int flag_found = 0;
+    while (1) {
+        flag_found = 0;
         for (int i = 0; i <= NUM_CUSTOMERS - 1; i++) {
-            if (!finish[i] && is_leq(need[i], work, NUM_RESOURCES)) {
+            if (0 == finish[i] && 1 == is_leq(need[i], work, NUM_RESOURCES)) {
                 flag_found = 1;
                 for (int j = 0; j <= NUM_RESOURCES - 1; j++) {
                     work[j] += allocation[i][j];
@@ -139,12 +189,24 @@ int state_is_safe(int *in_avail, int *in_alloc, int *in_need) {
                 break;
             }
         }
-        if (!flag_found) {
-            return 0;
-        }
+        if (0 == flag_found) { break; }
     }
-    return 1;
+    if (0 == flag_found) {
+        int is_all_true = 1;
+        for (int i = 0; i <= NUM_CUSTOMERS - 1; i++) {
+            if (1 != finish[i]) {
+                is_all_true = 0;
+                break;
+            }
+        }
+        if (1 == is_all_true) { return 1; }
+    }
+    cout << endl;
+    for (int j = 0; j <= NUM_CUSTOMERS - 1; j++)
+        cout << finish[j] << " ";
+    return 0;
 }
+
 
 /*!
  * Output Values: AVAILABLE, MAX, ALLOCATION, NEED
@@ -186,7 +248,7 @@ void output_values() {
     }
     printf("%s", end_of_field.c_str());
 
-    // NEED: Needed Resources for Each Customer
+    // NEED: Remaining Resources Needs for Each Customer
     printf("NEED - Shape (%d, %d)\n", NUM_CUSTOMERS, NUM_RESOURCES);
     for (int c = 0; c <= NUM_CUSTOMERS - 1; c++) {
         printf("%s", indent.c_str(), c);
