@@ -276,7 +276,7 @@ void output_values() {
     // MAX: Maximum Resources for Each Customer
     printf("MAX - Shape (%d, %d)\n", NUM_CUSTOMERS, NUM_RESOURCES);
     for (int c = 0; c <= NUM_CUSTOMERS - 1; c++) {
-        printf("%s", indent.c_str(), c);
+        printf("%s", indent.c_str());
         for (int r = 0; r <= NUM_RESOURCES - 1; r++) {
             printf("%d ", maximum[c][r]);
         }
@@ -287,7 +287,7 @@ void output_values() {
     // ALLOCATION: Allocated Resources for Each Customer
     printf("ALLOCATION - Shape (%d, %d)\n", NUM_CUSTOMERS, NUM_RESOURCES);
     for (int c = 0; c <= NUM_CUSTOMERS - 1; c++) {
-        printf("%s", indent.c_str(), c);
+        printf("%s", indent.c_str());
         for (int r = 0; r <= NUM_RESOURCES - 1; r++) {
             printf("%d ", allocation[c][r]);
         }
@@ -298,7 +298,7 @@ void output_values() {
     // NEED: Remaining Resources Needs for Each Customer
     printf("NEED - Shape (%d, %d)\n", NUM_CUSTOMERS, NUM_RESOURCES);
     for (int c = 0; c <= NUM_CUSTOMERS - 1; c++) {
-        printf("%s", indent.c_str(), c);
+        printf("%s", indent.c_str());
         for (int r = 0; r <= NUM_RESOURCES - 1; r++) {
             printf("%d ", need[c][r]);
         }
