@@ -80,45 +80,6 @@ int main(int argc, char *argv[]) {
 }
 
 /*!
- * Create a New Memory Block Representation Object
- * @param start             start index of the new memory block
- * @param end               end index of the new memory block
- * @param label             label of the new memory block
- * @param prev              pointer of the previous memory block
- * @param next              pointer of the next memory block
- * @return                  newly created memory block
- */
-memory_block *create_new_block(size_t start, size_t end, const char *label,
-                               memory_block *prev, memory_block *next) {
-    memory_block *new_block = new memory_block;
-    if (NULL == new_block) {
-        printf("[Error] Failed to Create New Memory Block Representation.\n");
-        exit(-1);
-    }
-
-    // assign values of the features of the new memory block
-    // start & end indices in the memory block
-    new_block->start = start;
-    new_block->end = end;
-    // (un)used block' label
-    if (0 == strlen(label)) {         // unused block
-        new_block->label = NULL;
-    }
-    else {                          // used block
-        new_block->label = new char[sizeof(char) * (strlen(label) + 1)];
-        strcpy(new_block->label, label);
-    }
-    // insert and link the new block
-    new_block->prev = prev;
-    new_block->next = next;
-    if (NULL != prev) { prev->next = new_block; }
-    if (NULL != next) { next->prev = new_block; }
-
-    return new_block;
-}
-
-
-/*!
  * Init: Parse & Store Input AVAILABLE Values, Read MAX from File
  * @param argc              number of arguments
  * @param argv              arguments
@@ -266,6 +227,44 @@ int state_is_safe() {
     // return 0;
 }
 
+
+/*!
+ * Create a New Memory Block Representation Object
+ * @param start             start index of the new memory block
+ * @param end               end index of the new memory block
+ * @param label             label of the new memory block
+ * @param prev              pointer of the previous memory block
+ * @param next              pointer of the next memory block
+ * @return                  newly created memory block
+ */
+memory_block *create_new_block(size_t start, size_t end, const char *label,
+                               memory_block *prev, memory_block *next) {
+    memory_block *new_block = new memory_block;
+    if (NULL == new_block) {
+        printf("[Error] Failed to Create New Memory Block Representation.\n");
+        exit(-1);
+    }
+
+    // assign values of the features of the new memory block
+    // start & end indices in the memory block
+    new_block->start = start;
+    new_block->end = end;
+    // (un)used block' label
+    if (0 == strlen(label)) {         // unused block
+        new_block->label = NULL;
+    }
+    else {                          // used block
+        new_block->label = new char[sizeof(char) * (strlen(label) + 1)];
+        strcpy(new_block->label, label);
+    }
+    // insert and link the new block
+    new_block->prev = prev;
+    new_block->next = next;
+    if (NULL != prev) { prev->next = new_block; }
+    if (NULL != next) { next->prev = new_block; }
+
+    return new_block;
+}
 
 /*!
  * Output Values: Memory Holes Usage Status
