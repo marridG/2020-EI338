@@ -19,10 +19,9 @@ memory_block *create_new_block(size_t start, size_t end, const char *label,
                                memory_block *prev, memory_block *next);
 int init(int argc, char *argv[]);
 void output_values();
-int is_leq(const int *opr_1, const int *opr_2, int len);
-int state_is_safe();
 int request_memory(const char *label, size_t size, char mode);
-int release_resources(int customer_idx, const int *release);
+int release_resources(const char *label);
+int compact();
 
 
 int main(int argc, char *argv[]) {
@@ -103,6 +102,7 @@ int init(int argc, char *argv[]) {
     return 0;
 }
 
+
 int request_memory(const char *label, size_t size, char mode) {
     //     if (customer_idx < 0 || customer_idx > NUM_CUSTOMERS - 1) {
     //         printf("[Error] Invalid Customer Index. ");
@@ -141,13 +141,7 @@ int request_memory(const char *label, size_t size, char mode) {
     //     return -4;
 }
 
-/*!
- * React when Processes Release Resources
- * @param customer_idx      release request customer index
- * @param release           requested released resources amount
- * @return                  0 if success; negative otherwise
- */
-int release_resources(int customer_idx, const int *release) {
+int release_resources(const char *label) {
     //     if (customer_idx < 0 || customer_idx > NUM_CUSTOMERS - 1) {
     //         printf("[Error] Invalid Customer Index. ");
     //         return -1;
@@ -172,59 +166,8 @@ int release_resources(int customer_idx, const int *release) {
     //     return 0;
 }
 
-
-/*!
- * Judge whether list A <= B Element-wise
- * @param opr_1             list A
- * @param opr_2             list B
- * @param len               length of the list (len(A)=len(B))
- * @return                  1 if (A<=B).all(); 0 otherwise
- */
-int is_leq(const int *opr_1, const int *opr_2, int len) {
-    for (int i = 0; i <= len - 1; i++) {
-        if (opr_1[i] > opr_2[i]) {
-            return 0;
-        }
-    }
-    return 1;
-}
-
-/*!
- * Judge by Safety Algorithm whether a State is Safe
- * @return                  1 if safe; 0 if unsafe
- */
-int state_is_safe() {
-    // int work[NUM_RESOURCES], finish[NUM_CUSTOMERS];
-    // memcpy(work, available, NUM_RESOURCES * sizeof(int));
-    // memset(finish, 0, NUM_CUSTOMERS * sizeof(int));
-    //
-    // int flag_found = 0;
-    // while (1) {
-    //     flag_found = 0;
-    //     for (int i = 0; i <= NUM_CUSTOMERS - 1; i++) {
-    //         if (0 == finish[i] && 1 == is_leq(need[i], work, NUM_RESOURCES)) {
-    //             flag_found = 1;
-    //             for (int j = 0; j <= NUM_RESOURCES - 1; j++) {
-    //                 work[j] += allocation[i][j];
-    //             }
-    //             finish[i] = 1;
-    //             break;
-    //         }
-    //     }
-    //     if (0 == flag_found) { break; }
-    // }
-    // if (0 == flag_found) {
-    //     int is_all_true = 1;
-    //     for (int i = 0; i <= NUM_CUSTOMERS - 1; i++) {
-    //         if (1 != finish[i]) {
-    //             is_all_true = 0;
-    //             break;
-    //         }
-    //     }
-    //     if (1 == is_all_true) { return 1; }
-    // }
-    //
-    // return 0;
+int compact() {
+    ;
 }
 
 
