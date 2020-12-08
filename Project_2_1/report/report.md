@@ -1,5 +1,5 @@
 # Project 2-1 Report
-EI338 Computer Systems Engineering, SJTU, 2020 Spring  
+EI338 Computer Systems Engineering, SJTU, 2020 Fall  
 **by Prof. Li J.**
 <!-- <br> -->
 
@@ -735,11 +735,14 @@ echo "Try Unrecognizable Commands, We can also Exit Shell by Calling exit Once"
 <a id="test-results"></a>
 ### Test Results
 The test results are shown below:  
-<img src="pics/1.PNG" alt="drawing" width="80%; margin:auto auto;"/>
+<div style="text-align: center;">
+    <img src="pics/1.PNG" alt="drawing" width="80%; margin:0 auto;"/>
+</div>
 
 Additional screenshot illustrating the debug messages is given as follows:  
-<img src="pics/2.PNG" alt="drawing" width="80%; margin:auto auto;"/>
-
+<div style="text-align: center;">
+    <img src="pics/2.PNG" alt="drawing" width="80%; margin:0 auto;"/>
+</div>
 
 
 <br><br>

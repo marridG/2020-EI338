@@ -1,5 +1,5 @@
 # Project 1 Report
-EI338 Computer Systems Engineering, SJTU, 2020 Spring  
+EI338 Computer Systems Engineering, SJTU, 2020 Fall  
 **by Prof. Li J.**
 <!-- <br> -->
 
@@ -346,7 +346,7 @@ MODULE_AUTHOR("G");
 For convenience, a `.sh` script is designed to test all the codes.  
 To use, say the script file named `run.sh` stored in the same directory where the codes are, execute `sudo sh run.sh` (or `sudo sh run.sh > out.txt` to save the outputs).  
 The codes are given as follows:
-```
+```bash
 clear_dmesg(){
     echo "Clearing Kernel Log Buffer"
     dmesg -c
@@ -433,12 +433,11 @@ echo "\tModule Removed"
 <a id="results"></a>
 ### Results
 
-![123](pics/1.PNG)  
-<!-- Toy Tasks Outputs -->
-![123](pics/2.PNG)    
-<!-- Assignemnt 1 Outputs -->
-![123](pics/3.PNG)   
-<!-- Assignemnt 2 Outputs -->
+<div style="text-align: center;">
+    <img src="pics/1.PNG" alt="drawing" width="80%; margin:0 auto;"/>
+    <img src="pics/2.PNG" alt="drawing" width="80%; margin:0 auto;"/>
+    <img src="pics/3.PNG" alt="drawing" width="80%; margin:0 auto;"/>
+</div>
 
 
 <br>

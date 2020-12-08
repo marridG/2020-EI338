@@ -1,5 +1,5 @@
 # Project 2-2 Report
-EI338 Computer Systems Engineering, SJTU, 2020 Spring  
+EI338 Computer Systems Engineering, SJTU, 2020 Fall  
 **by Prof. Li J.**
 <!-- <br> -->
 
@@ -222,7 +222,9 @@ echo "\tModule Removed"
 <a id="test-results"></a>
 ### Test Results
 The test results are shown below:  
-<img src="pics/1.PNG" alt="drawing" width="90%; margin:auto auto;"/>
+<div style="text-align: center;">
+    <img src="pics/1.PNG" alt="drawing" width="90%; margin:0 auto;"/>
+</div>
 
 
 
