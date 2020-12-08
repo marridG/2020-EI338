@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
  */
 int init(int argc, char *argv[], const char *resources_file) {
     if (1 + NUM_RESOURCES != argc) {
-        printf("Incorrect number of parameters.\n");
+        printf("[Error] Incorrect Number of Initialization Parameters.\n");
         return -1;
     }
 
@@ -107,7 +107,7 @@ int init(int argc, char *argv[], const char *resources_file) {
     // get MAX values from the init file
     FILE *f = fopen(resources_file, "r");
     if (NULL == f) {                            // nullptr possibly not supported by the compiler
-        printf("Unable to open file: %s\n", resources_file);
+        printf("[Error] Failed to Open File: %s\n", resources_file);
         return -2;
     }
     for (int c = 0; c < NUM_CUSTOMERS; c++) {
@@ -118,7 +118,7 @@ int init(int argc, char *argv[], const char *resources_file) {
     }
     fclose(f);
 
-    printf("Initialized, ready to run.\n");
+    printf("[INFO] Initialized.\n");
     return 0;
 }
 
