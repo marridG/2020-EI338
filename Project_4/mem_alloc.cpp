@@ -16,7 +16,9 @@ struct MEMORY_BLOCK {                           // memory block representation
 size_t MEMORY_SIZE = 0;                         // initialized total memory size
 MEMORY_BLOCK *MEMORY_ALL;                       // head of memory blocks representations linked list
 const int MAX_LABEL_LEN = 10;                   // maximum length of the labels of processed
+#ifdef CHECK_LABEL
 vector<string> USED_LABELS = {};                // vector of used labels
+#endif
 
 
 MEMORY_BLOCK *create_new_block(size_t start, size_t end, const char *label, int used,
