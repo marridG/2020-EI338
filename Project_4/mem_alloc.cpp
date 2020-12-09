@@ -198,7 +198,7 @@ int release_memory(const char *label) {
             }
 
         }
-        // target IS found (and thus updated)
+        // target IS found (and thus is already updated)
         //      possibly merge the current unused block with the previous unused block
         if (NULL != crt_block->prev && 0 == crt_block->prev->used && 0 == crt_block->used) {
             MEMORY_BLOCK *crt_block_prev = crt_block->prev;
