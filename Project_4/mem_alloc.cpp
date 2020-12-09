@@ -263,7 +263,6 @@ int compact() {
 
             // case II: prev unused, current unused => merge
         else {
-            cout << "prev unused" << endl;
             MEMORY_BLOCK *crt_block_prev = crt_block->prev;
             crt_block->prev = crt_block_prev->prev;
             if (NULL != crt_block_prev->prev) {
