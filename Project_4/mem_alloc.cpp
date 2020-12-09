@@ -3,7 +3,7 @@
 using namespace std;
 
 
-#define DEBUG                                   // debug mode switch
+// #define DEBUG                                   // debug mode switch
 #define CHECK_LABEL                             // whether to ensure no duplicate labels
 
 
