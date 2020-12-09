@@ -3,18 +3,21 @@
 using namespace std;
 
 
-#define DEBUG
+#define DEBUG                                   // debug mode switch
+#define CHECK_LABEL                             // whether to ensure no duplicate labels
 
 
-struct MEMORY_BLOCK {
+struct MEMORY_BLOCK {                           // memory block representation
     size_t start = -1, end = -1, size = -1;
     int used = -1;
-    char *label;
+    char *label = NULL;
     struct MEMORY_BLOCK *prev = NULL, *next = NULL;
 };
-size_t MEMORY_SIZE = 0;
-MEMORY_BLOCK *MEMORY_ALL;
-const int MAX_LABEL_LEN = 10;
+size_t MEMORY_SIZE = 0;                         // initialized total memory size
+MEMORY_BLOCK *MEMORY_ALL;                       // head of memory blocks representations linked list
+const int MAX_LABEL_LEN = 10;                   // maximum length of the labels of processed
+vector<string> USED_LABELS = {};                // vector of used labels
+
 
 MEMORY_BLOCK *create_new_block(size_t start, size_t end, const char *label, int used,
                                MEMORY_BLOCK *prev, MEMORY_BLOCK *next);
@@ -35,6 +38,7 @@ int main(int argc, char *argv[]) {
     char arg2[4] = "100";
     argv[0] = arg1;
     argv[1] = arg2;
+    freopen("../Project_4/test_inputs.txt", "r", stdin);
 #endif
 
     if (0 != init(argc, argv)) return 0;
@@ -62,6 +66,11 @@ int main(int argc, char *argv[]) {
             output_values();
             op_success = -1;
         }
+
+        else if (strcmp(op, "C") == 0) {        // compact unused memory blocks
+            op_success = (0 == compact());
+        }
+
         else if (strcmp(op, "X") == 0) {        // exit
             break;
         }
@@ -120,6 +129,15 @@ int request_memory(const char *label, size_t size, char mode) {
         printf("[Error] No Available Memory Holes. ");
         return -2;
     }
+#ifdef CHECK_LABEL
+    string label_str = label;
+    int label_is_used = (find(USED_LABELS.begin(), USED_LABELS.end(), label_str)
+                         != USED_LABELS.end());
+    if (1 == label_is_used) {
+        printf("[Error] Label Already Used. ");
+        return -3;
+    }
+#endif
 
     hole->label = new char[sizeof(char) * (strlen(label) + 1)];
     strcpy(hole->label, label);
@@ -132,6 +150,9 @@ int request_memory(const char *label, size_t size, char mode) {
         hole->end = hole->start + size - 1;
         hole->size = size;
     }
+#ifdef CHECK_LABEL
+    USED_LABELS.push_back(label_str);
+#endif
 #ifdef DEBUG
     output_values();
 #endif
@@ -140,11 +161,13 @@ int request_memory(const char *label, size_t size, char mode) {
 
 /*!
  * React when Processes Release Memory Allocation
+ *      [ALERT] Memory of ONLY 1ST Processes with Duplicate Labels will be Released
  * @param label             label of the to-release process
  * @return                  0 if success; negative otherwise
  */
 int release_memory(const char *label) {
     MEMORY_BLOCK *crt_block = MEMORY_ALL;
+    int target_idx = 0;
     int target_found = 0;
     while (NULL != crt_block) {
         // target NOT found
@@ -152,6 +175,7 @@ int release_memory(const char *label) {
             // the current is NOT the target (unused or !label)
             if (0 == crt_block->used || 0 != strcmp(crt_block->label, label)) {
                 crt_block = crt_block->next;
+                target_idx++;
                 continue;
             }
                 // the current IS the target
@@ -160,8 +184,11 @@ int release_memory(const char *label) {
                 delete[] crt_block->label;
                 crt_block->label = NULL;
                 crt_block->used = 0;
+#ifdef CHECK_LABEL
+                USED_LABELS.erase(USED_LABELS.begin() + target_idx);
+#endif
             }
-                // internel error
+                // internal error
             else {
                 printf("[Error] Internal Error. "
                        "Possibly Unused Blocks have Labels.\n");
@@ -178,6 +205,7 @@ int release_memory(const char *label) {
                 crt_block_prev->prev->next = crt_block;
             }
             crt_block->start = crt_block_prev->start;
+            crt_block->size += crt_block_prev->size;
             delete crt_block_prev;
         }
         // handle the case that the head is deleted
@@ -187,6 +215,7 @@ int release_memory(const char *label) {
         }
 
         crt_block = crt_block->next;
+        target_idx++;
     }
 
     if (0 == target_found) {                    // the target process label is not found
@@ -199,8 +228,65 @@ int release_memory(const char *label) {
     return 0;
 }
 
+/*!
+ * React to Compact Unused Blocks
+ *      1. prev used, current unused => swap
+ *      2. prev unused, current unused => merge
+ * @return                  0 if success; negative otherwise
+ */
 int compact() {
-    return 1;
+    int compaction_cnt = 0;
+    MEMORY_BLOCK *crt_block = MEMORY_ALL;
+    while (NULL != crt_block) {
+        if (NULL == crt_block->prev || 1 == crt_block->prev->used) {
+            crt_block = crt_block->next;
+            continue;
+        }
+
+        // case I: prev unused, current used => swap (by memory info)
+        if (1 == crt_block->used) {
+            // swap label pointers
+            crt_block->prev->label = crt_block->label;
+            crt_block->label = NULL;
+            // update used
+            crt_block->prev->used = 1;
+            crt_block->used = 0;
+            // update start, end, size
+            size_t temp_prev_size = crt_block->prev->size;
+            crt_block->prev->end = crt_block->prev->start + crt_block->size - 1;
+            crt_block->prev->size = crt_block->size;
+            crt_block->start = crt_block->prev->end + 1;
+            crt_block->size = temp_prev_size;
+        }
+
+            // case II: prev unused, current unused => merge
+        else {
+            cout << "prev unused" << endl;
+            MEMORY_BLOCK *crt_block_prev = crt_block->prev;
+            crt_block->prev = crt_block_prev->prev;
+            if (NULL != crt_block_prev->prev) {
+                crt_block_prev->prev->next = crt_block;
+            }
+            crt_block->start = crt_block_prev->start;
+            crt_block->size += crt_block_prev->size;
+            delete crt_block_prev;
+            compaction_cnt++;
+        }
+
+        // handle the case that the head is deleted
+        //      happens when the head is released & head->next is unused
+        if (NULL == crt_block->prev) {
+            MEMORY_ALL = crt_block;
+        }
+
+        crt_block = crt_block->next;
+    }
+
+    printf("Compacted %d Block(s). ", compaction_cnt + 1);
+#ifdef DEBUG
+    output_values();
+#endif
+    return 0;
 }
 
 
@@ -311,10 +397,10 @@ void output_values() {
         printf("%sAddress(es) [%07zu - %07zu] (%07zu)",
                indent.c_str(), crt_block->start, crt_block->end, crt_block->size);
         if (0 == crt_block->used) {             // unused blocks
-            printf("  =>  Unused\n");
+            printf("  =>  UNUSED\n");
         }
         else {                                  // used blocks
-            printf("  =>  Process %s\n", crt_block->label);
+            printf("  =>  PROCESS %s\n", crt_block->label);
         }
         crt_block = crt_block->next;
     }
