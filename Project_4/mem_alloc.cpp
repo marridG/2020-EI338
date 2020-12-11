@@ -29,6 +29,7 @@ MEMORY_BLOCK *find_best_hole(size_t size, char mode);
 int request_memory(const char *label, size_t size, char mode);
 int release_memory(const char *label);
 int compact();
+void free_space();
 
 
 int main(int argc, char *argv[]) {
@@ -74,6 +75,7 @@ int main(int argc, char *argv[]) {
         }
 
         else if (strcmp(op, "X") == 0) {        // exit
+            free_space();
             break;
         }
         else {                                  // invalid operation identifier
@@ -194,6 +196,7 @@ int release_memory(const char *label) {
             else {
                 printf("[Error] Internal Error. "
                        "Possibly Unused Blocks have Labels.\n");
+                free_space();
                 exit(-3);
             }
 
@@ -305,6 +308,7 @@ MEMORY_BLOCK *create_new_block(size_t start, size_t end, const char *label, int 
     MEMORY_BLOCK *new_block = new MEMORY_BLOCK;
     if (NULL == new_block) {
         printf("[Error] Failed to Create New Memory Block Representation.\n");
+        free_space();
         exit(-1);
     }
 
@@ -324,6 +328,7 @@ MEMORY_BLOCK *create_new_block(size_t start, size_t end, const char *label, int 
     else {                                      // invalid conditions
         delete new_block;
         printf("[Error] Used & StrLen Mismatch.\n");
+        free_space();
         exit(-2);
     }
     // insert and link the new block
@@ -408,4 +413,14 @@ void output_values() {
 
     printf("==============================\n");
     printf("==============================\n");
+}
+
+void free_space() {
+    MEMORY_BLOCK *crt_block = MEMORY_ALL;
+    while (NULL != crt_block) {
+        if (NULL != crt_block->label) {
+            delete[] crt_block->label;
+        }
+        crt_block = crt_block->next;
+    }
 }
