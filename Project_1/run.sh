@@ -18,6 +18,8 @@ insmod ex_P-4.ko
 dmesg
 echo "\tModule Installed"
 
+sleep 3
+
 # remove module
 echo "\tRemoving Module"
 rmmod ex_P-4
