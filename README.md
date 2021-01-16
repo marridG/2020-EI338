@@ -24,3 +24,7 @@ For F18 this year, reports are required only for submission. Besides, a simple f
  | [Project 2-2](./Project_2_2), <br>[report](./Project_2_2/report/report.md)   | Linux Kernel Module for Task Information  | Chapter 3<br>(P-15/22) | Design a kernel module to display information of the input task (by PID) using `/porc` file system |
  | [Project 3](./Project_3), <br>[report](./Project_3/report/report.md)         | Banker’s Algorithm                        | Chapter 8<br>(P-45/47) | Implement Banker's Algorithm |
  | [Project 4](./Project_4), <br>[report](./Project_4/report/report.md)         | Contiguous Memory Allocation              | Chapter 9<br>(P-48/50) | Manage contiguous memory (actually representations). Support allocation, release and compaction. | 
+
+
+## Notes
+To get started with the labs, basic Makefile knowledge might be necessary (even not explicitly required in the handouts).
