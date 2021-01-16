@@ -1,4 +1,4 @@
-# 2020 EI338
+# 2020 EI338 Assignments & Lab Projects
 Computer Systems Engineering *(Operating Systems & Computer Architecture)*
 
 2020 Fall, SJTU
