@@ -568,9 +568,9 @@ X
 ### Test Results
 The test results are shown below,     
 <div style="text-align: center;">
-    <img src="pics/1.PNG" alt="drawing" width="60%; margin:0 auto;"/>
-    <img src="pics/2.PNG" alt="drawing" width="60%; margin:0 auto;"/>
-    <img src="pics/3.PNG" alt="drawing" width="60%; margin:0 auto;"/>
+    <img src="pics/1.png" alt="drawing" width="60%; margin:0 auto;"/>
+    <img src="pics/2.png" alt="drawing" width="60%; margin:0 auto;"/>
+    <img src="pics/3.png" alt="drawing" width="60%; margin:0 auto;"/>
 </div>
 
 
